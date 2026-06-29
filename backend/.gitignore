@@ -1,0 +1,23 @@
+# Dependencias y build
+node_modules/
+dist/
+
+# Variables de entorno (secretos)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# SO / editores
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+
+# Tests / cobertura (por si se agregan después)
+coverage/
