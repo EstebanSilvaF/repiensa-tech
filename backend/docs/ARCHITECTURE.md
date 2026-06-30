@@ -17,6 +17,9 @@ src/
 │       └── shared/        # Reglas reutilizables entre módulos
 ├── infrastructure/        # Capa de infraestructura
 │   ├── config/
+│   │   ├── cors.ts
+│   │   ├── env.ts
+│   │   └── swagger.ts     # Swagger UI (lee docs/openapi.yaml)
 │   └── persistence/
 │       ├── prisma.ts
 │       └── repositories/
@@ -61,3 +64,41 @@ Cada capa solo depende de la capa inmediatamente inferior.
 | `domain/validators/*.validator.ts` | Reglas de caso de uso específico que componen las shared |
 
 Ejemplo: `chat.validator.ts` importa `chatExistsRule` y `productExistsRule` de `shared/` y agrega solo reglas propias del flujo (estado del chat, entrega confirmada).
+
+## Documentación de la API (Swagger / OpenAPI)
+
+La especificación vive en **`docs/openapi.yaml`** (formato OpenAPI 3). No se mezcla con controllers ni routes para mantener la capa de presentación limpia.
+
+| Pieza | Ubicación | Rol |
+|-------|-----------|-----|
+| Especificación | `docs/openapi.yaml` | Contrato de endpoints, schemas y seguridad |
+| Guía frontend | `docs/FRONTEND_API.md` | Flujos de negocio, ejemplos React, WebSockets |
+| UI interactiva | `infrastructure/config/swagger.ts` | Sirve Swagger UI en `/api/docs` |
+
+### Cómo ver la documentación
+
+Con el backend en desarrollo:
+
+```
+http://localhost:3000/api/docs
+```
+
+En producción Swagger está **desactivado por defecto**. Para habilitarlo:
+
+```env
+ENABLE_SWAGGER=true
+```
+
+### Cómo mantenerla al día
+
+1. Agregar o modificar un endpoint en `presentation/routes/`.
+2. Actualizar el path correspondiente en `docs/openapi.yaml`.
+3. Si cambian DTOs, actualizar `components/schemas` en el mismo archivo.
+4. Opcional: reflejar el cambio en `FRONTEND_API.md` si afecta al frontend.
+
+### Probar endpoints autenticados
+
+1. Ejecutar `POST /api/auth/login` desde Swagger UI.
+2. Copiar el `token` de la respuesta.
+3. Clic en **Authorize** y pegar: `Bearer <token>` (Swagger agrega el prefijo si solo pegas el token en algunos casos — usar el formato `Bearer eyJ...`).
+

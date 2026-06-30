@@ -1,5 +1,6 @@
 import express from 'express';
 import { corsMiddleware } from './infrastructure/config/cors';
+import { isSwaggerEnabled, swaggerRouter } from './infrastructure/config/swagger';
 import { errorHandler } from './presentation/middlewares/error.middleware';
 import authRoutes from './presentation/routes/auth.routes';
 import universityRoutes from './presentation/routes/university.routes';
@@ -18,6 +19,10 @@ app.use(express.json());
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
+
+if (isSwaggerEnabled()) {
+  app.use('/api/docs', swaggerRouter());
+}
 
 app.use('/api/auth', authRoutes);
 app.use('/api/universities', universityRoutes);
