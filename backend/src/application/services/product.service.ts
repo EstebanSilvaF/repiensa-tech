@@ -1,4 +1,5 @@
 import { productRepository } from '../../infrastructure/persistence/repositories/product.repository';
+import { expandSearchTerms } from '../../infrastructure/config/ai';
 import { uploadService } from './upload.service';
 import { CreateProductDTO, ProductFilters } from '../../domain/types/product.types';
 import {
@@ -9,7 +10,14 @@ import {
 
 export const productService = {
   async getAll(universityId: string, filters: ProductFilters) {
-    return productRepository.findAll(universityId, filters);
+    const searchTerms = filters.search?.trim()
+      ? await expandSearchTerms(filters.search)
+      : undefined;
+
+    return productRepository.findAll(universityId, {
+      ...filters,
+      searchTerms,
+    });
   },
 
   async getById(id: string) {
