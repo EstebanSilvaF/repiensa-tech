@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - esteban2
 
 jobs:
   build-and-push-backend:
