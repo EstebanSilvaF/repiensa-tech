@@ -1,4 +1,17 @@
 services:
+  postgres:
+    image: postgres:16
+    container_name: repiensa-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: repensatech
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: on-failure
+
   backend:
     image: esteban003/repiensa-backend:latest
     container_name: repiensa-backend
@@ -6,6 +19,8 @@ services:
       - "3000:3000"
     env_file:
       - ./backend/.env
+    depends_on:
+      - postgres
     restart: on-failure
 
   frontend:
@@ -15,3 +30,6 @@ services:
       - "8081:80"
     depends_on:
       - backend
+
+volumes:
+  postgres_data:
