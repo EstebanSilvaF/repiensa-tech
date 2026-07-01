@@ -1,6 +1,7 @@
 .favorites-page {
   min-height: 100vh;
-  background: var(--color-background);
+  background: #f0eeeb;
+  color: var(--color-black);
 }
 
 .favorites-page__main {
@@ -10,17 +11,40 @@
 }
 
 .favorites-page__back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
   text-decoration: none;
+  cursor: pointer;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: color 0.2s ease;
+}
+
+.favorites-page__back:hover,
+.favorites-page__back:focus-visible {
+  background: transparent;
+  color: var(--color-primary-dark);
+  outline: none;
 }
 
 .favorites-page__content {
   padding: 2rem;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-white);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .favorites-page__header {
@@ -33,13 +57,13 @@
 
 .favorites-page__header h1 {
   margin: 0;
-  color: var(--color-white);
+  color: var(--color-black);
   font-size: 2rem;
 }
 
 .favorites-page__header p {
   margin: 0.5rem 0 0;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--color-text-body);
 }
 
 .favorites-page__badge {
@@ -48,14 +72,15 @@
   justify-content: center;
   padding: 0.75rem 1rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--color-white);
+  background: #f4f8f6;
+  color: var(--color-primary);
+  border: 1px solid rgba(26, 156, 110, 0.16);
   font-weight: 700;
 }
 
 .favorites-page__status {
   margin: 0;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--color-text-body);
 }
 
 .favorites-page__empty {
@@ -78,7 +103,7 @@
   padding: 0.9rem 1.25rem;
   border-radius: 999px;
   background: var(--color-primary);
-  color: var(--color-black);
+  color: var(--color-white);
   text-decoration: none;
   font-weight: 600;
 }
@@ -92,17 +117,18 @@
 .favorites-page__card {
   overflow: hidden;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--color-white);
   text-decoration: none;
   color: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .favorites-page__card-image {
   aspect-ratio: 1;
   display: grid;
   place-items: center;
-  background: rgba(255, 255, 255, 0.05);
+  background: #ececea;
 }
 
 .favorites-page__card-img {
@@ -118,13 +144,13 @@
 .favorites-page__card-body h2 {
   margin: 0 0 0.75rem;
   font-size: 1rem;
-  color: var(--color-white);
+  color: var(--color-black);
 }
 
 .favorites-page__card-price {
   margin: 0;
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-black);
   font-weight: 700;
 }
 
@@ -132,7 +158,7 @@
   display: inline-flex;
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--color-primary);
   color: var(--color-white);
   font-size: 0.85rem;
   font-weight: 700;

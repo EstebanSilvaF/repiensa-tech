@@ -42,4 +42,5 @@ export interface ProductFilters {
   condition?:   ProductCondition;
   is_donation?: boolean;
   search?:      string;
+  searchTerms?: string[];
 }

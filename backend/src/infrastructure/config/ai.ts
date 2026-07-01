@@ -95,3 +95,52 @@ export async function analyzeProductImage(base64Image: string, mimeType: string)
   const text = response.choices[0]?.message?.content?.trim() ?? '';
   return parseSuggestion(text);
 }
+
+export async function expandSearchTerms(query: string): Promise<string[]> {
+  const normalizedQuery = query.trim();
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  if (!apiKey) {
+    return [normalizedQuery];
+  }
+
+  try {
+    const response = await getGroqClient().chat.completions.create({
+      model: GROQ_MODEL,
+      messages: [
+        {
+          role: 'user',
+          content: `Expande esta búsqueda de una plataforma de intercambio de hardware universitario. Devuelve SOLO un JSON válido con un array de 5 a 8 términos relacionados, útiles para encontrar productos. Usa palabras cortas y claras. Consulta: ${normalizedQuery}`,
+        },
+      ],
+      temperature: 0.2,
+      max_tokens: 120,
+    });
+
+    const text = response.choices[0]?.message?.content?.trim() ?? '';
+    const cleaned = text.replace(/```json|```/g, '').trim();
+
+    try {
+      const parsed = JSON.parse(cleaned) as unknown;
+      if (Array.isArray(parsed)) {
+        const terms = parsed
+          .filter((value): value is string => typeof value === 'string')
+          .map((value) => value.trim().toLowerCase())
+          .filter(Boolean);
+
+        if (terms.length > 0) {
+          return Array.from(new Set([normalizedQuery.toLowerCase(), ...terms].slice(0, 8)));
+        }
+      }
+    } catch {
+      // fall back to a simple tokenized version
+    }
+  } catch {
+    // fall back to the original query when the AI service is unavailable
+  }
+
+  return [normalizedQuery];
+}

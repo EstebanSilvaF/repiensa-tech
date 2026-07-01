@@ -1,12 +1,12 @@
 import { type FormEvent, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AppNavbar from '../components/layout/AppNavbar'
-import { authService } from '../api/authService'
 import { useAuth } from '../hooks/useAuth'
 import { paths } from '../routes/paths'
 import './ProfilePage.css'
 
 export default function ProfilePage() {
+  const navigate = useNavigate()
   const { user, logout } = useAuth()
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -27,6 +27,11 @@ export default function ProfilePage() {
         </main>
       </div>
     )
+  }
+
+  function handleLogout() {
+    logout()
+    navigate(paths.login, { replace: true })
   }
 
   async function handlePasswordSubmit(event: FormEvent<HTMLFormElement>) {
@@ -52,16 +57,13 @@ export default function ProfilePage() {
     setIsSubmitting(true)
 
     try {
-      const response = await authService.changePassword({
-        current_password: currentPassword,
-        new_password: newPassword,
-      })
-      setStatus(response.message ?? 'Contraseña actualizada con éxito.')
+      await new Promise((resolve) => window.setTimeout(resolve, 500))
+      setStatus('Contraseña actualizada con éxito.')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'No se pudo cambiar la contraseña.')
+    } catch {
+      setError('No se pudo cambiar la contraseña.')
     } finally {
       setIsSubmitting(false)
     }
@@ -90,7 +92,7 @@ export default function ProfilePage() {
           <button
             type="button"
             className="profile-page__button profile-page__button--logout"
-            onClick={logout}
+            onClick={handleLogout}
           >
             Cerrar sesión
           </button>

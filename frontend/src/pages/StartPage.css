@@ -120,18 +120,19 @@
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  z-index: 2;
+  width: 2.7rem;
+  height: 2.7rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  color: rgba(0, 0, 0, 0.65);
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(0, 0, 0, 0.7);
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .start-page__like-button:hover,
@@ -139,11 +140,13 @@
   background: var(--color-primary);
   color: var(--color-white);
   transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
 .start-page__like-button--active {
   background: var(--color-primary);
   color: var(--color-white);
+  border-color: var(--color-primary);
 }
 
 .start-page__card-image {

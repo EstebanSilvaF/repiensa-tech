@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { reservationService } from '../api/reservationService'
 import { transactionService } from '../api/transactionService'
 import AppNavbar from '../components/layout/AppNavbar'
@@ -123,6 +123,15 @@ export default function HistoryPage() {
     [transactions],
   )
 
+  function handleBack() {
+    if (window.history.length > 1) {
+      navigate(-1)
+      return
+    }
+
+    navigate(paths.profile, { replace: true })
+  }
+
   const grouped = useMemo(() => {
     const map = new Map<string, Transaction[]>()
     for (const tx of filtered) {
@@ -151,9 +160,9 @@ export default function HistoryPage() {
       <AppNavbar />
 
       <main className="history-page__main">
-        <Link to={paths.gallery} className="history-page__back">
+        <button type="button" className="history-page__back" onClick={handleBack}>
           ← Volver
-        </Link>
+        </button>
 
         <header className="history-page__header">
           <h1 className="history-page__title">Historial</h1>

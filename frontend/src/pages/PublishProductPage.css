@@ -18,16 +18,26 @@
 .publish-page__back {
   display: inline-block;
   margin-bottom: 1rem;
+  padding: 0;
+  border: none;
+  background: transparent;
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 500;
   color: rgba(0, 0, 0, 0.45);
   text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
   transition: color 0.2s ease;
 }
 
-.publish-page__back:hover {
+.publish-page__back:hover,
+.publish-page__back:focus-visible {
   color: var(--color-black);
+  background: transparent;
+  outline: none;
 }
 
 .publish-page__title {

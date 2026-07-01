@@ -59,11 +59,13 @@ export const productRepository = {
     if (filters.category) where.category = filters.category;
     if (filters.condition) where.condition = filters.condition;
     if (filters.is_donation !== undefined) where.isDonation = filters.is_donation;
-    if (filters.search) {
-      where.OR = [
-        { name: { contains: filters.search, mode: 'insensitive' } },
-        { description: { contains: filters.search, mode: 'insensitive' } },
-      ];
+
+    const searchTerms = [...new Set([filters.search, ...(filters.searchTerms ?? [])].filter((term): term is string => Boolean(term?.trim())))];
+    if (searchTerms.length > 0) {
+      where.OR = searchTerms.flatMap((term) => [
+        { name: { contains: term, mode: 'insensitive' as const } },
+        { description: { contains: term, mode: 'insensitive' as const } },
+      ]);
     }
 
     const rows = await prisma.product.findMany({
