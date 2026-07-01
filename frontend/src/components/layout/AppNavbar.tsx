@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { paths } from '../../routes/paths'
@@ -16,10 +17,31 @@ export default function AppNavbar() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { isAuthenticated, logout, user } = useAuth()
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  function handleLogoutConfirm() {
+    setShowLogoutConfirm(true)
+    setIsProfileMenuOpen(false)
+  }
 
   function handleLogout() {
     logout()
-    navigate(paths.home)
+    setShowLogoutConfirm(false)
+    setIsProfileMenuOpen(false)
+    navigate(paths.login, { replace: true })
   }
 
   return (
@@ -59,15 +81,57 @@ export default function AppNavbar() {
           <ChatIcon />
         </Link>
         {isAuthenticated ? (
-          <Link
-            to={paths.profile}
-            className={`app-navbar__icon-btn${
-              pathname === paths.profile ? ' app-navbar__icon-btn--active' : ''
-            }`}
-            aria-label={user ? `Perfil de ${user.full_name}` : 'Perfil'}
-          >
-            <UserIcon />
-          </Link>
+          <div className="app-navbar__profile" ref={profileMenuRef}>
+            <button
+              type="button"
+              className={`app-navbar__icon-btn app-navbar__profile-button${
+                pathname === paths.profile ? ' app-navbar__icon-btn--active' : ''
+              }`}
+              aria-label={user ? `Perfil de ${user.full_name}` : 'Perfil'}
+              aria-expanded={isProfileMenuOpen}
+              aria-haspopup="menu"
+              onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+            >
+              <UserIcon />
+            </button>
+
+            {isProfileMenuOpen && (
+              <div className="app-navbar__profile-menu" role="menu">
+                <Link
+                  to={paths.profile}
+                  className="app-navbar__profile-item"
+                  role="menuitem"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  Mi perfil
+                </Link>
+                <Link
+                  to={paths.favorites}
+                  className="app-navbar__profile-item"
+                  role="menuitem"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  Favoritos
+                </Link>
+                <Link
+                  to={paths.history}
+                  className="app-navbar__profile-item"
+                  role="menuitem"
+                  onClick={() => setIsProfileMenuOpen(false)}
+                >
+                  Historial
+                </Link>
+                <button
+                  type="button"
+                  className="app-navbar__profile-item app-navbar__profile-item--danger"
+                  role="menuitem"
+                  onClick={handleLogoutConfirm}
+                >
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           <Link
             to={paths.login}
@@ -78,6 +142,31 @@ export default function AppNavbar() {
           </Link>
         )}
       </div>
+
+      {showLogoutConfirm && (
+        <div className="app-navbar__confirm-overlay" role="presentation">
+          <div className="app-navbar__confirm-dialog" role="dialog" aria-modal="true" aria-label="Confirmar cierre de sesión">
+            <h3>¿Seguro que quieres cerrar sesión?</h3>
+            <p>Perderás el acceso a tu sesión actual.</p>
+            <div className="app-navbar__confirm-actions">
+              <button
+                type="button"
+                className="app-navbar__confirm-btn app-navbar__confirm-btn--secondary"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="app-navbar__confirm-btn app-navbar__confirm-btn--primary"
+                onClick={handleLogout}
+              >
+                Sí, cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

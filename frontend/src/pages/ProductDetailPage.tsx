@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { chatService } from '../api/chatService'
 import { ApiError } from '../api/client'
 import { productService } from '../api/productService'
@@ -29,6 +29,15 @@ export default function ProductDetailPage() {
 
   const isOwnProduct = Boolean(product && user && product.seller_id === user.id)
   const canReserve = !!product && product.status === 'available' && !isOwnProduct
+
+  function handleBack() {
+    if (window.history.length > 1) {
+      navigate(-1)
+      return
+    }
+
+    navigate(paths.gallery, { replace: true })
+  }
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -113,9 +122,9 @@ export default function ProductDetailPage() {
       <AppNavbar />
 
       <main className="product-detail-page__main">
-        <Link to={paths.gallery} className="product-detail-page__back">
+        <button type="button" className="product-detail-page__back" onClick={handleBack}>
           ← Volver
-        </Link>
+        </button>
 
         <h1 className="product-detail-page__title">Detalle del producto</h1>
 

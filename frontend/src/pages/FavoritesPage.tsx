@@ -18,7 +18,6 @@ export default function FavoritesPage() {
   const navigate = useNavigate()
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -33,7 +32,6 @@ export default function FavoritesPage() {
 
     async function loadFavorites() {
       setIsLoading(true)
-      setError(null)
 
       try {
         const favoriteIds = getLikedProductIds()
@@ -68,14 +66,23 @@ export default function FavoritesPage() {
 
   const favoriteCount = useMemo(() => products.length, [products])
 
+  function handleBack() {
+    if (window.history.length > 1) {
+      navigate(-1)
+      return
+    }
+
+    navigate(paths.profile, { replace: true })
+  }
+
   return (
     <div className="favorites-page">
       <AppNavbar />
 
       <main className="favorites-page__main">
-        <Link to={paths.profile} className="favorites-page__back">
+        <button type="button" className="favorites-page__back" onClick={handleBack}>
           ← Volver al perfil
-        </Link>
+        </button>
 
         <section className="favorites-page__content">
           <div className="favorites-page__header">
