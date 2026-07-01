@@ -1,0 +1,17 @@
+services:
+  backend:
+    image: esteban003/repiensa-backend:latest
+    container_name: repiensa-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    restart: on-failure
+
+  frontend:
+    image: esteban003/repiensa-frontend:latest
+    container_name: repiensa-frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
