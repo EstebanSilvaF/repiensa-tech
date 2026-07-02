@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { paths } from '../../routes/paths'
 import ChatIcon from '../icons/ChatIcon'
@@ -14,13 +14,7 @@ const navLinks = [
 
 export default function AppNavbar() {
   const { pathname } = useLocation()
-  const navigate = useNavigate()
-  const { isAuthenticated, logout, user } = useAuth()
-
-  function handleLogout() {
-    logout()
-    navigate(paths.home)
-  }
+  const { isAuthenticated, user } = useAuth()
 
   return (
     <header className="app-navbar">

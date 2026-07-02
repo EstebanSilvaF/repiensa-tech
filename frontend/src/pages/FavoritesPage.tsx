@@ -18,7 +18,6 @@ export default function FavoritesPage() {
   const navigate = useNavigate()
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -33,7 +32,6 @@ export default function FavoritesPage() {
 
     async function loadFavorites() {
       setIsLoading(true)
-      setError(null)
 
       try {
         const favoriteIds = getLikedProductIds()

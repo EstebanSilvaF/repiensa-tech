@@ -6,16 +6,19 @@ import {
   validateCreateProduct,
   validateProductDeletion,
 } from '../../domain/validators/product.validator';
+import { enrichProductsWithSeller } from '../helpers/user-profile.helper';
 
 export const productService = {
   async getAll(universityId: string, filters: ProductFilters) {
-    return productRepository.findAll(universityId, filters);
+    const products = await productRepository.findAll(universityId, filters);
+    return enrichProductsWithSeller(products);
   },
 
   async getById(id: string) {
     const product = await productRepository.findById(id);
     assertProductExists(product);
-    return product;
+    const [enriched] = await enrichProductsWithSeller([product], { includeEmail: true });
+    return enriched;
   },
 
   async getMine(sellerId: string) {

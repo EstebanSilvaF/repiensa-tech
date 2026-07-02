@@ -1,55 +1,75 @@
-import { prisma } from '../prisma';
+import { Types } from 'mongoose';
 import { User, CreateUserDTO } from '../../../domain/types/user.types';
+import { UserModel, UserDocument } from '../mongo/models/user.model';
 
-function mapUser(row: {
-  id: string;
-  universityId: string;
-  fullName: string;
-  email: string;
-  passwordHash: string;
-  role: User['role'];
-  createdAt: Date;
-  updatedAt: Date;
-}): User {
+function mapUser(doc: UserDocument): User {
   return {
-    id: row.id,
-    university_id: row.universityId,
-    full_name: row.fullName,
-    email: row.email,
-    password_hash: row.passwordHash,
-    role: row.role,
-    created_at: row.createdAt,
-    updated_at: row.updatedAt,
+    id: doc._id.toString(),
+    university_id: doc.university_id,
+    full_name: doc.full_name,
+    email: doc.email,
+    password_hash: doc.password_hash,
+    role: doc.role,
+    created_at: doc.created_at,
+    updated_at: doc.updated_at,
   };
 }
 
 export const userRepository = {
   async findByEmail(email: string): Promise<User | null> {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await UserModel.findOne({ email }).exec();
     return user ? mapUser(user) : null;
   },
 
   async findById(id: string): Promise<User | null> {
-    const user = await prisma.user.findUnique({ where: { id } });
+    if (!Types.ObjectId.isValid(id)) return null;
+    const user = await UserModel.findById(id).exec();
     return user ? mapUser(user) : null;
   },
 
+  async findByIds(ids: string[]): Promise<User[]> {
+    const validIds = ids.filter((id) => Types.ObjectId.isValid(id));
+    if (validIds.length === 0) return [];
+
+    const users = await UserModel.find({
+      _id: { $in: validIds.map((id) => new Types.ObjectId(id)) },
+    }).exec();
+
+    return users.map(mapUser);
+  },
+
   async create(data: CreateUserDTO & { password_hash: string }): Promise<User> {
-    const user = await prisma.user.create({
-      data: {
-        universityId: data.university_id,
-        fullName: data.full_name,
+    try {
+      const user = await UserModel.create({
+        university_id: data.university_id,
+        full_name: data.full_name,
         email: data.email,
-        passwordHash: data.password_hash,
-      },
-    });
-    return mapUser(user);
+        password_hash: data.password_hash,
+      });
+      return mapUser(user);
+    } catch (error) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'code' in error &&
+        (error as { code: number }).code === 11000
+      ) {
+        throw new Error('El email ya está registrado');
+      }
+      throw error;
+    }
   },
 
   async updatePassword(id: string, password_hash: string): Promise<void> {
-    await prisma.user.update({
-      where: { id },
-      data: { passwordHash: password_hash },
-    });
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error('Usuario no encontrado');
+    }
+    const result = await UserModel.updateOne(
+      { _id: new Types.ObjectId(id) },
+      { $set: { password_hash } },
+    ).exec();
+    if (result.matchedCount === 0) {
+      throw new Error('Usuario no encontrado');
+    }
   },
 };

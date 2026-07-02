@@ -68,25 +68,18 @@ export const productRepository = {
 
     const rows = await prisma.product.findMany({
       where,
-      include: { seller: { select: { fullName: true } } },
       orderBy: { createdAt: 'desc' },
     });
 
-    return rows.map((row) =>
-      mapProduct(row, { seller_name: row.seller.fullName })
-    );
+    return rows.map((row) => mapProduct(row));
   },
 
-  async findById(id: string): Promise<(Product & { seller_name?: string; seller_email?: string }) | null> {
+  async findById(id: string): Promise<Product | null> {
     const row = await prisma.product.findUnique({
       where: { id },
-      include: { seller: { select: { fullName: true, email: true } } },
     });
     if (!row) return null;
-    return mapProduct(row, {
-      seller_name: row.seller.fullName,
-      seller_email: row.seller.email,
-    });
+    return mapProduct(row);
   },
 
   async findBySeller(sellerId: string): Promise<Product[]> {

@@ -950,11 +950,28 @@ Para pruebas manuales, importar `repensa-postman-collection.json` en la raíz de
 
 ## Base de datos y seed
 
-Al arrancar el servidor (`npm run dev`), `initDatabase()`:
+El backend usa **dos bases de datos**:
 
-1. Ejecuta `db/schema.sql` si no existen tablas.
-2. Aplica migraciones idempotentes (ej. columna `image_public_id`).
-3. Ejecuta `db/seed.sql` **solo si** la tabla `universities` está vacía.
+| Motor | Datos |
+|-------|-------|
+| **PostgreSQL** (Prisma) | Universidades, productos, chats, reservas, transacciones, notificaciones |
+| **MongoDB** (Mongoose) | Usuarios y autenticación |
+
+Los endpoints y tipos del frontend **no cambian**. Los IDs de usuario en las respuestas son strings (ObjectId de MongoDB).
+
+### Variables requeridas (backend `.env`)
+
+```env
+DATABASE_URL=postgresql://...
+MONGO_URI=mongodb://localhost:27017/repensatech
+```
+
+### Cargar datos de prueba
+
+```bash
+cd backend
+npm run db:reset   # migraciones + seed coordinado (Mongo + PostgreSQL)
+```
 
 ### Datos de prueba (seed)
 
@@ -966,7 +983,7 @@ Al arrancar el servidor (`npm run dev`), `initDatabase()`:
 | Admin | `admin@uniempresarial.edu.co` / `Admin1!` |
 | Productos demo | Arduino Uno R3, Sensor HC-SR04 (imágenes de cuenta demo Cloudinary) |
 
-Para recargar el seed en desarrollo: vaciar tablas o recrear la base `repensa`.
+Para recargar el seed en desarrollo: `npm run db:reset` desde `backend/`.
 
 ### Variables Cloudinary (backend `.env`)
 

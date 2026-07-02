@@ -55,8 +55,6 @@ export const transactionRepository = {
       },
       include: {
         product: { select: { name: true, imageUrl: true, category: true } },
-        buyer: { select: { fullName: true } },
-        seller: { select: { fullName: true } },
       },
       orderBy: { confirmedAt: 'desc' },
     });
@@ -66,8 +64,8 @@ export const transactionRepository = {
       product_name: row.product.name,
       product_image: row.product.imageUrl,
       product_category: row.product.category,
-      buyer_name: row.buyer.fullName,
-      seller_name: row.seller.fullName,
+      buyer_name: '',
+      seller_name: '',
       direction: row.buyerId === userId ? 'purchase' : 'sale',
     }));
   },
