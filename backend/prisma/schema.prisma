@@ -38,6 +38,17 @@ enum ProductCategory {
   displays
   cables
   power
+  books_notes
+  lab_science
+  art_design
+  tools_hardware
+  sports_fitness
+  clothing_accessories
+  furniture_decor
+  musical_instruments
+  stationery_office
+  home_kitchen
+  services
   other
 
   @@map("product_category")
