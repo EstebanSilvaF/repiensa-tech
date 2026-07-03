@@ -7,10 +7,6 @@ type ChatExtras = {
   product_name?: string;
   product_price?: number;
   product_image?: string;
-  buyer_name?: string;
-  seller_name?: string;
-  buyer_university_name?: string;
-  seller_university_name?: string;
   last_message?: string;
   last_message_at?: Date;
 };
@@ -51,9 +47,8 @@ function mapMessage(
     appointmentTime: string | null;
     appointmentLocation: string | null;
     createdAt: Date;
-  },
-  senderName?: string
-): Message & { sender_name?: string } {
+  }
+): Message {
   return {
     id: row.id,
     chat_id: row.chatId,
@@ -65,40 +60,21 @@ function mapMessage(
     appointment_time: row.appointmentTime,
     appointment_location: row.appointmentLocation,
     created_at: row.createdAt,
-    ...(senderName ? { sender_name: senderName } : {}),
   };
 }
 
 const chatInclude = {
   product: { select: { name: true, price: true, imageUrl: true } },
-  buyer: {
-    select: {
-      fullName: true,
-      university: { select: { name: true } },
-    },
-  },
-  seller: {
-    select: {
-      fullName: true,
-      university: { select: { name: true } },
-    },
-  },
 } as const;
 
 function mapChatExtrasFromRow(row: {
   product: { name: string; price: Decimal; imageUrl: string };
-  buyer: { fullName: string; university: { name: string } };
-  seller: { fullName: string; university: { name: string } };
   messages?: { content: string; createdAt: Date }[];
 }): ChatExtras {
   return {
     product_name: row.product.name,
     product_price: decimalToNumber(row.product.price),
     product_image: row.product.imageUrl,
-    buyer_name: row.buyer.fullName,
-    seller_name: row.seller.fullName,
-    buyer_university_name: row.buyer.university.name,
-    seller_university_name: row.seller.university.name,
     last_message: row.messages?.[0]?.content,
     last_message_at: row.messages?.[0]?.createdAt,
   };
@@ -159,14 +135,13 @@ export const chatRepository = {
     });
   },
 
-  async getMessages(chatId: string): Promise<(Message & { sender_name?: string })[]> {
+  async getMessages(chatId: string): Promise<Message[]> {
     const rows = await prisma.message.findMany({
       where: { chatId },
-      include: { sender: { select: { fullName: true } } },
       orderBy: { createdAt: 'asc' },
     });
 
-    return rows.map((row) => mapMessage(row, row.sender.fullName));
+    return rows.map((row) => mapMessage(row));
   },
 
   async createMessage(
@@ -180,7 +155,7 @@ export const chatRepository = {
       location: string;
       status: AppointmentStatus;
     }
-  ): Promise<Message & { sender_name?: string }> {
+  ): Promise<Message> {
     const row = await prisma.message.create({
       data: {
         chatId,
@@ -196,29 +171,26 @@ export const chatRepository = {
             }
           : {}),
       },
-      include: { sender: { select: { fullName: true } } },
     });
-    return mapMessage(row, row.sender.fullName);
+    return mapMessage(row);
   },
 
-  async findMessageById(id: string): Promise<(Message & { sender_name?: string }) | null> {
+  async findMessageById(id: string): Promise<Message | null> {
     const row = await prisma.message.findUnique({
       where: { id },
-      include: { sender: { select: { fullName: true } } },
     });
-    return row ? mapMessage(row, row.sender.fullName) : null;
+    return row ? mapMessage(row) : null;
   },
 
   async updateAppointmentStatus(
     id: string,
     status: AppointmentStatus,
     content: string
-  ): Promise<Message & { sender_name?: string }> {
+  ): Promise<Message> {
     const row = await prisma.message.update({
       where: { id },
       data: { appointmentStatus: status, content },
-      include: { sender: { select: { fullName: true } } },
     });
-    return mapMessage(row, row.sender.fullName);
+    return mapMessage(row);
   },
 };

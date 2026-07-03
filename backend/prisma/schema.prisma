@@ -15,13 +15,6 @@ enum SubscriptionStatus {
   @@map("subscription_status")
 }
 
-enum UserRole {
-  student
-  admin
-
-  @@map("user_role")
-}
-
 enum ProductCondition {
   new
   good
@@ -113,35 +106,9 @@ model University {
   createdAt          DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt          DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  users    User[]
   products Product[]
 
   @@map("universities")
-}
-
-model User {
-  id           String   @id @default(cuid())
-  universityId String   @map("university_id")
-  fullName     String   @map("full_name") @db.VarChar(150)
-  email        String   @unique @db.VarChar(254)
-  passwordHash String   @map("password_hash")
-  role         UserRole @default(student)
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  university            University     @relation(fields: [universityId], references: [id], onDelete: Restrict)
-  products              Product[]      @relation("SellerProducts")
-  reservations          Reservation[]
-  buyerChats            Chat[]         @relation("BuyerChats")
-  sellerChats           Chat[]         @relation("SellerChats")
-  messages              Message[]
-  buyerTransactions     Transaction[]  @relation("BuyerTransactions")
-  sellerTransactions    Transaction[]  @relation("SellerTransactions")
-  notifications         Notification[]
-
-  @@index([universityId], map: "idx_users_university")
-  @@index([email], map: "idx_users_email")
-  @@map("users")
 }
 
 model Product {
@@ -160,7 +127,6 @@ model Product {
   createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  seller       User          @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Restrict)
   university   University    @relation(fields: [universityId], references: [id], onDelete: Restrict)
   reservations Reservation[]
   chats        Chat[]
@@ -183,7 +149,6 @@ model Reservation {
   createdAt DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
 
   product      Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
-  buyer        User          @relation(fields: [buyerId], references: [id], onDelete: Restrict)
   transactions Transaction[]
 
   @@unique([productId, status], map: "uq_product_active_reservation")
@@ -204,8 +169,6 @@ model Chat {
   updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   product      Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
-  buyer        User          @relation("BuyerChats", fields: [buyerId], references: [id], onDelete: Restrict)
-  seller       User          @relation("SellerChats", fields: [sellerId], references: [id], onDelete: Restrict)
   messages     Message[]
   transactions Transaction[]
 
@@ -228,8 +191,7 @@ model Message {
   appointmentLocation String?            @map("appointment_location") @db.VarChar(200)
   createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  chat   Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender User @relation(fields: [senderId], references: [id], onDelete: Restrict)
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   @@index([chatId], map: "idx_messages_chat")
   @@index([senderId], map: "idx_messages_sender")
@@ -248,8 +210,6 @@ model Transaction {
   createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
   product     Product      @relation(fields: [productId], references: [id], onDelete: Restrict)
-  seller      User         @relation("SellerTransactions", fields: [sellerId], references: [id], onDelete: Restrict)
-  buyer       User         @relation("BuyerTransactions", fields: [buyerId], references: [id], onDelete: Restrict)
   chat        Chat         @relation(fields: [chatId], references: [id], onDelete: Restrict)
   reservation Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
 
@@ -269,8 +229,6 @@ model Notification {
   referenceId   String?           @map("reference_id")
   referenceType NotificationRef?  @map("reference_type")
   createdAt     DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId], map: "idx_notifications_user")
   @@index([userId, isRead], map: "idx_notifications_is_read")

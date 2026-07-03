@@ -22,6 +22,10 @@ src/
 │   │   └── swagger.ts     # Swagger UI (lee docs/openapi.yaml)
 │   └── persistence/
 │       ├── prisma.ts
+│       ├── mongo/
+│       │   ├── connection.ts
+│       │   └── models/
+│       │       └── user.model.ts
 │       └── repositories/
 ├── shared/                # Utilidades transversales
 │   ├── utils/
@@ -33,10 +37,25 @@ src/
 ## Flujo de dependencias
 
 ```
-routes → controllers → services → repositories → prisma → PostgreSQL
+routes → controllers → services → repositories → prisma / mongoose → PostgreSQL / MongoDB
 ```
 
 Cada capa solo depende de la capa inmediatamente inferior.
+
+### Persistencia dual
+
+| Datos | Motor | Acceso |
+|-------|-------|--------|
+| Usuarios y autenticación | MongoDB | `userRepository` (Mongoose) |
+| Resto del dominio | PostgreSQL | Repositorios Prisma |
+
+```
+services → userRepository → MongoDB
+services → otros repositories → PostgreSQL (Prisma)
+services → user-profile.helper → une datos en memoria
+```
+
+Los IDs de usuario en PostgreSQL (`seller_id`, `buyer_id`, `user_id`, `sender_id`) son strings que referencian documentos MongoDB. No hay FKs cruzadas; el enriquecimiento (nombres, emails) se hace en la capa de aplicación.
 
 ## Responsabilidades
 

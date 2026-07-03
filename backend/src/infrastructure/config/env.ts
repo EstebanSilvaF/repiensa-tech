@@ -12,4 +12,5 @@ export const env = {
   port: Number(process.env.PORT) || 3000,
   jwtSecret: requireEnv('JWT_SECRET'),
   databaseUrl: requireEnv('DATABASE_URL'),
+  mongoUri: requireEnv('MONGO_URI'),
 };

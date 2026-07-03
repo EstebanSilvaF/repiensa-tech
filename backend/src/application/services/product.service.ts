@@ -7,6 +7,7 @@ import {
   validateCreateProduct,
   validateProductDeletion,
 } from '../../domain/validators/product.validator';
+import { enrichProductsWithSeller } from '../helpers/user-profile.helper';
 
 export const productService = {
   async getAll(universityId: string, filters: ProductFilters) {
@@ -14,16 +15,18 @@ export const productService = {
       ? await expandSearchTerms(filters.search)
       : undefined;
 
-    return productRepository.findAll(universityId, {
+    const products = await productRepository.findAll(universityId, {
       ...filters,
       searchTerms,
     });
+    return enrichProductsWithSeller(products);
   },
 
   async getById(id: string) {
     const product = await productRepository.findById(id);
     assertProductExists(product);
-    return product;
+    const [enriched] = await enrichProductsWithSeller([product], { includeEmail: true });
+    return enriched;
   },
 
   async getMine(sellerId: string) {

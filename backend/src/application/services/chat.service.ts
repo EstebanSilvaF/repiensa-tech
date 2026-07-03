@@ -19,16 +19,22 @@ import {
   validateSendMessage,
 } from '../../domain/validators/chat.validator';
 import { assertProductExists } from '../../domain/validators/product.validator';
+import {
+  enrichChatsWithParticipants,
+  enrichMessagesWithSender,
+} from '../helpers/user-profile.helper';
 
 export const chatService = {
   async getMyChats(userId: string) {
-    return chatRepository.findByUser(userId);
+    const chats = await chatRepository.findByUser(userId);
+    return enrichChatsWithParticipants(chats);
   },
 
   async getById(chatId: string, userId: string) {
     const chat = await chatRepository.findById(chatId);
     assertChatAccess(chat, userId);
-    return chat;
+    const [enriched] = await enrichChatsWithParticipants([chat!]);
+    return enriched;
   },
 
   async openChat(productId: string, buyerId: string) {
@@ -43,7 +49,8 @@ export const chatService = {
 
   async getMessages(chatId: string, userId: string) {
     await chatService.getById(chatId, userId);
-    return chatRepository.getMessages(chatId);
+    const messages = await chatRepository.getMessages(chatId);
+    return enrichMessagesWithSender(messages);
   },
 
   async sendMessage(chatId: string, senderId: string, data: SendMessageDTO) {
@@ -61,17 +68,22 @@ export const chatService = {
       const location = appointment.location.trim();
       content = formatProposalContent({ day, time, location });
 
-      return chatRepository.createMessage(chatId, senderId, content, type, {
-        day,
-        time,
-        location,
-        status: 'pending',
-      });
+      return enrichMessagesWithSender([
+        await chatRepository.createMessage(chatId, senderId, content, type, {
+          day,
+          time,
+          location,
+          status: 'pending',
+        }),
+      ]).then(([message]) => message);
     } else {
       validateMessageContent(content);
     }
 
-    return chatRepository.createMessage(chatId, senderId, content, type);
+    const [message] = await enrichMessagesWithSender([
+      await chatRepository.createMessage(chatId, senderId, content, type),
+    ]);
+    return message;
   },
 
   async respondToAppointment(
@@ -83,27 +95,27 @@ export const chatService = {
     const chat = await chatRepository.findById(chatId);
     validateSendMessage(chat, userId);
 
-    const message = await chatRepository.findMessageById(messageId);
-    if (!message || message.chat_id !== chatId) {
+    const existingMessage = await chatRepository.findMessageById(messageId);
+    if (!existingMessage || existingMessage.chat_id !== chatId) {
       throw new Error('Mensaje no encontrado');
     }
-    if (message.type !== 'appointment') {
+    if (existingMessage.type !== 'appointment') {
       throw new Error('Este mensaje no es una propuesta de encuentro');
     }
-    if (message.appointment_status !== 'pending') {
+    if (existingMessage.appointment_status !== 'pending') {
       throw new Error('Esta propuesta ya fue respondida');
     }
-    if (message.sender_id === userId) {
+    if (existingMessage.sender_id === userId) {
       throw new Error('No puedes responder tu propia propuesta');
     }
-    if (!message.appointment_day || !message.appointment_time || !message.appointment_location) {
+    if (!existingMessage.appointment_day || !existingMessage.appointment_time || !existingMessage.appointment_location) {
       throw new Error('La propuesta no tiene datos completos');
     }
 
     const appointment = {
-      day: message.appointment_day,
-      time: message.appointment_time,
-      location: message.appointment_location,
+      day: existingMessage.appointment_day,
+      time: existingMessage.appointment_time,
+      location: existingMessage.appointment_location,
     };
 
     const status = action === 'accept' ? 'accepted' : 'rejected';
@@ -112,7 +124,10 @@ export const chatService = {
         ? formatAcceptedContent(appointment)
         : formatRejectedContent(appointment);
 
-    return chatRepository.updateAppointmentStatus(messageId, status, content);
+    const [updatedMessage] = await enrichMessagesWithSender([
+      await chatRepository.updateAppointmentStatus(messageId, status, content),
+    ]);
+    return updatedMessage;
   },
 
   async confirmDelivery(chatId: string, userId: string) {

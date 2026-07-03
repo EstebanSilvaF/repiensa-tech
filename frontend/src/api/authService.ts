@@ -1,4 +1,6 @@
 import type {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
@@ -17,5 +19,10 @@ export const authService = {
     apiClient.post<RegisterResponse>('/auth/register', {
       body: data,
       auth: false,
+    }),
+
+  changePassword: (data: ChangePasswordRequest) =>
+    apiClient.patch<ChangePasswordResponse>('/auth/change-password', {
+      body: data,
     }),
 }

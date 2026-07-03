@@ -100,6 +100,15 @@ export interface LoginResponse {
   user: User
 }
 
+export interface ChangePasswordRequest {
+  current_password: string
+  new_password: string
+}
+
+export interface ChangePasswordResponse {
+  message: string
+}
+
 export interface ProductFilters {
   category?: ProductCategory
   condition?: ProductCondition
