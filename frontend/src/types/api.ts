@@ -9,7 +9,18 @@ export type ProductCategory =
   | 'displays'
   | 'cables'
   | 'power'
-  | 'other'
+  | 'books_notes'
+  | 'lab_science'
+  | 'art_design'
+  | 'tools_hardware'
+  | 'sports_fitness'
+  | 'clothing_accessories'
+  | 'furniture_decor'
+  | 'musical_instruments'
+  | 'stationery_office'
+  | 'home_kitchen'
+  | 'services'
+  | 'other';
 
 export type SubscriptionStatus = 'active' | 'inactive' | 'expired'
 
