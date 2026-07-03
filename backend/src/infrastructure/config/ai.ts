@@ -20,6 +20,7 @@ function getGroqClient(): Groq {
   return client;
 }
 
+
 export interface ProductSuggestion {
   name:        string;
   description: string;
