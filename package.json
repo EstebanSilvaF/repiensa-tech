@@ -12,5 +12,8 @@
     "install:all": "npm install --prefix frontend && npm install --prefix backend",
     "db:migrate": "npm run db:migrate --prefix backend",
     "db:seed": "npm run db:seed --prefix backend"
+  },
+  "dependencies": {
+    "mongoose": "^9.7.3"
   }
 }

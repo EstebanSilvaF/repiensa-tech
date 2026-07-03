@@ -12,10 +12,20 @@ const PRODUCT_2_ID = 'clprodsensor001';
 const ADMIN_PASSWORD_HASH = '$2b$10$E1zYbUfaQQr49FfOMSBIe.ossGjfJrhDMvC25yIUOEyHIePqy8zYm';
 const STUDENT_PASSWORD_HASH = '$2b$10$YAIo7YHyOLFwcmUbHsZdaul.EVuVv6uFCPbcU1ikNmChQS34ndDuW';
 
+async function clearPostgresSeedData(): Promise<void> {
+  await prisma.transaction.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
+  await prisma.message.deleteMany({ where: { chat: { product: { universityId: UNIVERSITY_ID } } } });
+  await prisma.chat.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
+  await prisma.reservation.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
+  await prisma.product.deleteMany({ where: { universityId: UNIVERSITY_ID } });
+  await prisma.university.deleteMany({ where: { id: UNIVERSITY_ID } });
+}
+
 async function main(): Promise<void> {
   await connectMongo();
 
   await UserModel.deleteMany({});
+  await clearPostgresSeedData();
 
   await prisma.university.create({
     data: {

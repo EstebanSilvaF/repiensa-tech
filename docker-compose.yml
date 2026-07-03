@@ -12,6 +12,17 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: on-failure
 
+  mongodb:
+    image: mongo:8
+    container_name: repensa-mongo
+    restart: always
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
   backend:
     image: esteban003/repiensa-backend:latest
     container_name: repiensa-backend
@@ -19,8 +30,13 @@ services:
       - "3000:3000"
     env_file:
       - ./backend/.env
+    environment:
+      MONGO_URI: mongodb://mongodb:27017/repensatech
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/repensatech
+    command: sh -c "npx prisma migrate deploy && node dist/index.js"
     depends_on:
       - postgres
+      - mongodb
     restart: on-failure
 
   frontend:
@@ -33,3 +49,4 @@ services:
 
 volumes:
   postgres_data:
+  mongo_data:
