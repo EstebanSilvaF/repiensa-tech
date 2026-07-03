@@ -22,20 +22,22 @@ async function loadUniversitiesMap(ids: string[]) {
   );
 }
 
+type ProductWithSeller = Product & {
+  seller_name?: string;
+  seller_email?: string;
+};
+
 export async function enrichProductsWithSeller(
   products: Product[],
   options?: { includeEmail?: boolean },
-): Promise<Product[]> {
+): Promise<ProductWithSeller[]> {
   if (products.length === 0) return products;
 
   const usersMap = await loadUsersMap(products.map((product) => product.seller_id));
 
   return products.map((product) => {
     const seller = usersMap.get(product.seller_id);
-    const enriched = { ...product } as Product & {
-      seller_name?: string;
-      seller_email?: string;
-    };
+    const enriched = { ...product } as ProductWithSeller;
     if (seller) {
       enriched.seller_name = seller.full_name;
       if (options?.includeEmail) {
