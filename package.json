@@ -11,6 +11,7 @@
     "lint": "npm run lint --prefix frontend",
     "install:all": "npm install --prefix frontend && npm install --prefix backend",
     "db:migrate": "npm run db:migrate --prefix backend",
-    "db:seed": "npm run db:seed --prefix backend"
+    "db:seed": "npm run db:seed --prefix backend",
+    "test:e2e": "npm run test:e2e --prefix frontend"
   }
 }
