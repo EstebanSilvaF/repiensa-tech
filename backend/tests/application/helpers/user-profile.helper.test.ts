@@ -57,7 +57,7 @@ describe('user-profile.helper', () => {
       },
     ]);
 
-    expect(products[0].name).toBe('María Rodríguez');
+    expect(products[0].seller_name).toBe('María Rodríguez');
   });
   it('enrichChatsWithParticipants agrega nombres y universidades', async () => {
     findByIds.mockResolvedValue([
