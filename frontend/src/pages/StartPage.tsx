@@ -104,7 +104,7 @@ export default function StartPage() {
           <input
             type="search"
             className="start-page__search-input"
-            placeholder="Busca componentes de hardware o elementos necesarios"
+            placeholder="Busca productos, artículos o servicios..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
