@@ -119,34 +119,40 @@ export async function expandSearchTerms(query: string): Promise<string[]> {
       model: GROQ_MODEL,
       messages: [
         {
+          role: 'system',
+          content: 'Respondes ÚNICAMENTE con un objeto JSON válido, sin explicaciones, sin markdown, sin texto adicional antes o después.',
+        },
+        {
           role: 'user',
-          content: `Expande esta búsqueda de Re-Pensa, una plataforma universitaria donde estudiantes de CUALQUIER carrera compran, venden e intercambian artículos (electrónica, libros, laboratorio, arte, herramientas, ropa, instrumentos musicales, útiles, deporte, muebles, cocina/hogar, servicios, y cualquier otra cosa). Devuelve SOLO un JSON válido con un array de 6 a 10 términos relacionados en español, útiles para encontrar productos por nombre. Piensa en objetos concretos que un vendedor pondría en el título de su anuncio, incluyendo sinónimos, marcas comunes y variantes singular/plural. Consulta: ${normalizedQuery}`,
+          content: `Expande esta búsqueda de Re-Pensa, una plataforma universitaria donde estudiantes de CUALQUIER carrera compran, venden e intercambian artículos (electrónica, libros, laboratorio, arte, herramientas, ropa, instrumentos musicales, útiles, deporte, muebles, cocina/hogar, servicios, y cualquier otra cosa). Piensa en objetos concretos que un vendedor pondría en el título de su anuncio, incluyendo sinónimos, marcas comunes y variantes singular/plural. Consulta: "${normalizedQuery}"
+
+Responde con este formato exacto: {"terms": ["termino1", "termino2", ...]} con 6 a 10 términos en español.`,
         },
       ],
       temperature: 0.3,
-      max_tokens: 200,
+      max_tokens: 300,
+      response_format: { type: 'json_object' },
     });
 
     const text = response.choices[0]?.message?.content?.trim() ?? '';
-    const cleaned = text.replace(/```json|```/g, '').trim();
 
     try {
-      const parsed = JSON.parse(cleaned) as unknown;
-      if (Array.isArray(parsed)) {
-        const terms = parsed
-          .filter((value): value is string => typeof value === 'string')
-          .map((value) => value.trim().toLowerCase())
-          .filter(Boolean);
+      const parsed = JSON.parse(text) as { terms?: unknown };
+      const rawTerms = Array.isArray(parsed.terms) ? parsed.terms : [];
 
-        if (terms.length > 0) {
-          return Array.from(new Set([normalizedQuery.toLowerCase(), ...terms].slice(0, 10)));
-        }
+      const terms = rawTerms
+        .filter((value): value is string => typeof value === 'string')
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean);
+
+      if (terms.length > 0) {
+        return Array.from(new Set([normalizedQuery.toLowerCase(), ...terms].slice(0, 10)));
       }
-    } catch {
-      // fall back to a simple tokenized version
+    } catch (parseError) {
+      console.error('Error parseando JSON de expandSearchTerms:', parseError, 'Texto recibido:', text);
     }
-  } catch {
-    // fall back to the original query when the AI service is unavailable
+  } catch (err) {
+    console.error('Error llamando a Groq en expandSearchTerms:', err);
   }
 
   return [normalizedQuery];
