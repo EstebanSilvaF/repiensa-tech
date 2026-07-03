@@ -64,4 +64,90 @@ function parseSuggestion(text: string): ProductSuggestion {
       suggestion.category = 'other';
     }
     if (!VALID_CONDITIONS.includes(suggestion.condition as (typeof VALID_CONDITIONS)[number])) {
-      suggestion.condition
+      suggestion.condition = 'good';
+    }
+
+    return suggestion;
+  } catch {
+    return {
+      name:        'Artículo',
+      description: 'Artículo publicado para intercambio universitario.',
+      category:    'other',
+      condition:   'good',
+    };
+  }
+}
+
+export async function analyzeProductImage(base64Image: string, mimeType: string): Promise<ProductSuggestion> {
+  const response = await getGroqClient().chat.completions.create({
+    model: GROQ_MODEL,
+    messages: [
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: PROMPT },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:${mimeType};base64,${base64Image}`,
+            },
+          },
+        ],
+      },
+    ],
+    temperature: 0.2,
+    max_tokens: 300,
+  });
+
+  const text = response.choices[0]?.message?.content?.trim() ?? '';
+  return parseSuggestion(text);
+}
+
+export async function expandSearchTerms(query: string): Promise<string[]> {
+  const normalizedQuery = query.trim();
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const apiKey = process.env.GROQ_API_KEY?.trim();
+  if (!apiKey) {
+    return [normalizedQuery];
+  }
+
+  try {
+    const response = await getGroqClient().chat.completions.create({
+      model: GROQ_MODEL,
+      messages: [
+        {
+          role: 'user',
+          content: `Expande esta búsqueda de Re-Pensa, una plataforma universitaria donde estudiantes de CUALQUIER carrera compran, venden e intercambian artículos (electrónica, libros, laboratorio, arte, herramientas, ropa, instrumentos musicales, útiles, deporte, muebles, cocina/hogar, servicios, y cualquier otra cosa). Devuelve SOLO un JSON válido con un array de 6 a 10 términos relacionados en español, útiles para encontrar productos por nombre. Piensa en objetos concretos que un vendedor pondría en el título de su anuncio, incluyendo sinónimos, marcas comunes y variantes singular/plural. Consulta: ${normalizedQuery}`,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 200,
+    });
+
+    const text = response.choices[0]?.message?.content?.trim() ?? '';
+    const cleaned = text.replace(/```json|```/g, '').trim();
+
+    try {
+      const parsed = JSON.parse(cleaned) as unknown;
+      if (Array.isArray(parsed)) {
+        const terms = parsed
+          .filter((value): value is string => typeof value === 'string')
+          .map((value) => value.trim().toLowerCase())
+          .filter(Boolean);
+
+        if (terms.length > 0) {
+          return Array.from(new Set([normalizedQuery.toLowerCase(), ...terms].slice(0, 10)));
+        }
+      }
+    } catch {
+      // fall back to a simple tokenized version
+    }
+  } catch {
+    // fall back to the original query when the AI service is unavailable
+  }
+
+  return [normalizedQuery];
+}
