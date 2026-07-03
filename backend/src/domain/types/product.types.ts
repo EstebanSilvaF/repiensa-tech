@@ -7,8 +7,18 @@ export type ProductCategory =
   | 'displays'
   | 'cables'
   | 'power'
+  | 'books_notes'
+  | 'lab_science'
+  | 'art_design'
+  | 'tools_hardware'
+  | 'sports_fitness'
+  | 'clothing_accessories'
+  | 'furniture_decor'
+  | 'musical_instruments'
+  | 'stationery_office'
+  | 'home_kitchen'
+  | 'services'
   | 'other';
-
 export interface Product {
   id:            string;
   seller_id:     string;
