@@ -14,4 +14,11 @@ describe('Smoke — rutas públicas', () => {
     cy.get('#password').should('be.visible');
     cy.contains('button', 'Iniciar sesión').should('be.visible');
   });
+
+  it('navega a registro desde la landing', () => {
+    cy.visit('/');
+    cy.contains('a', 'Regístrate gratis').click();
+    cy.url().should('include', '/register');
+    cy.contains('h1', 'Crea tu cuenta').should('be.visible');
+  });
 });
