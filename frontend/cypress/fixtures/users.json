@@ -1,6 +1,16 @@
 {
   "student": {
     "email": "maria.rodriguez@uniempresarial.edu.co",
-    "password": "Estudiante1!"
+    "password": "Estudiante1!",
+    "fullName": "María Rodríguez"
+  },
+  "buyer": {
+    "email": "carlos.mendoza@uniempresarial.edu.co",
+    "password": "Estudiante1!",
+    "fullName": "Carlos Mendoza"
+  },
+  "products": {
+    "arduinoId": "clprodarduino001",
+    "sensorId": "clprodsensor001"
   }
 }
