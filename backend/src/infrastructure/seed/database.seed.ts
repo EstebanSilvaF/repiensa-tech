@@ -11,7 +11,7 @@ const PRODUCT_2_ID = 'clprodsensor001';
 
 const ADMIN_PASSWORD_HASH = '$2b$10$E1zYbUfaQQr49FfOMSBIe.ossGjfJrhDMvC25yIUOEyHIePqy8zYm';
 const STUDENT_PASSWORD_HASH = '$2b$10$YAIo7YHyOLFwcmUbHsZdaul.EVuVv6uFCPbcU1ikNmChQS34ndDuW';
-const LIBRARY_PASSWORD_HASH = '$2b$10$V7k5cY8zVjJxZJ3g8L6lM.jPNL9X0Y5UzF8v3kzJXx5i0xWQf6T0y';
+const LIBRARY_PASSWORD_HASH = '$2b$10$Esw6yh1E1HysOHrOxdbgOukezkFWAJ8wAgqyFoIxw68F7Gke8EaRi';
 
 async function clearPostgresSeedData(): Promise<void> {
   await prisma.transaction.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
