@@ -21,7 +21,7 @@ interface LibraryTransactionItem extends Transaction {
 type LibraryItem = LibraryProductItem | LibraryTransactionItem
 
 interface LibraryPageProps {
-  view?: 'default' | 'uploads' | 'delivered'
+  view?: 'default' | 'delivered'
 }
 
 export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
@@ -96,10 +96,6 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
   }, [isAuthenticated, user])
 
   const visibleProducts = useMemo<LibraryItem[]>(() => {
-    if (view === 'uploads') {
-      return products.filter((product) => product.seller_id === user?.id).map((product) => ({ ...product, kind: 'product' as const }))
-    }
-
     if (view === 'delivered') {
       return transactions.map((transaction) => ({ ...transaction, kind: 'transaction' as const }))
     }
@@ -169,11 +165,9 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
         <header className="history-page__header">
           <h1 className="history-page__title">Biblioteca</h1>
           <p className="history-page__subtitle">
-            {view === 'uploads'
-              ? 'Productos subidos por la biblioteca'
-              : view === 'delivered'
-                ? 'Historial de productos entregados'
-                : 'Productos disponibles para la universidad'}
+            {view === 'delivered'
+              ? 'Historial de productos entregados'
+              : 'Productos disponibles para la universidad'}
           </p>
         </header>
 
@@ -206,9 +200,7 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
                   <p className="history-item__meta">
                     {item.kind === 'transaction'
                       ? `Entregado por ${item.seller_name ?? 'Vendedor'} · Adquirido por ${item.buyer_name ?? 'Comprador'}`
-                      : item.kind === 'product' && view === 'uploads'
-                        ? `Subido por ${item.seller_name ?? 'Biblioteca'}`
-                        : `Subido por ${item.seller_name ?? 'Biblioteca'} · Universidad`}
+                      : `Subido por ${item.seller_name ?? 'Biblioteca'} · Universidad`}
                   </p>
                 </div>
                 <div className="history-item__aside">

@@ -27,7 +27,6 @@ export default function AppRoutes() {
       <Route path={paths.profile} element={<ProfilePage />} />
       <Route path={paths.chat} element={<ChatPage />} />
       <Route path={paths.library} element={<LibraryPage />} />
-      <Route path={paths.libraryUploads} element={<LibraryPage view="uploads" />} />
       <Route path={paths.libraryDelivered} element={<LibraryPage view="delivered" />} />
     </Routes>
   )

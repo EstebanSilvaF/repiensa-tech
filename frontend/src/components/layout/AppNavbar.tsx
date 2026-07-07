@@ -18,7 +18,6 @@ function getVisibleNavLinks(userRole?: string) {
     return [
       { label: 'Inicio', to: paths.gallery },
       { label: 'Biblioteca', to: paths.library },
-      { label: 'Subidos', to: paths.libraryUploads },
       { label: 'Entregados', to: paths.libraryDelivered },
     ]
   }
