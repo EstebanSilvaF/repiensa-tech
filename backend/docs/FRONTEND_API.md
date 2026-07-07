@@ -944,7 +944,9 @@ export const api = {
 
 ## Colección Postman
 
-Para pruebas manuales, importar `repensa-postman-collection.json` en la raíz del repo. El login guarda automáticamente la variable `token` en la colección.
+Para pruebas manuales, importar `repensa-postman-collection.json` en la raíz del repo y el entorno `postman/repensa-local.environment.json`. El login guarda automáticamente la variable `token` en la colección.
+
+Para automatizar con Newman: `npm run test:api` desde la raíz del monorepo. No hace falta `db:reset` en cada ejecución; ver [`docs/API_TESTING.md`](../../docs/API_TESTING.md).
 
 ---
 
