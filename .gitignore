@@ -28,6 +28,8 @@ pnpm-debug.log*
 
 # Tests / coverage
 coverage/
+.scannerwork/
+postman/results/*.json
 
 # Editors & IDEs
 .vscode/*

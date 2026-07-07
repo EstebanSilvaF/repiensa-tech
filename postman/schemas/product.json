@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "required": ["id", "name", "status", "seller_id"],
+  "properties": {
+    "id": { "type": "string" },
+    "seller_id": { "type": "string" },
+    "university_id": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "price": { "type": "number" },
+    "is_donation": { "type": "boolean" },
+    "category": { "type": "string" },
+    "condition": { "type": "string" },
+    "status": { "type": "string", "enum": ["available", "reserved", "sold"] }
+  }
+}

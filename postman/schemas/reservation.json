@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "required": ["id", "product_id", "buyer_id", "status"],
+  "properties": {
+    "id": { "type": "string" },
+    "product_id": { "type": "string" },
+    "buyer_id": { "type": "string" },
+    "fee_paid": { "type": "number" },
+    "status": { "type": "string", "enum": ["active", "completed", "expired"] }
+  }
+}

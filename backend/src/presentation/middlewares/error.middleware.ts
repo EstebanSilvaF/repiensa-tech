@@ -42,6 +42,15 @@ function resolveStatusCode(err: unknown): number {
   if (msg.includes('credenciales') || msg.includes('token')) return 401;
   if (msg.includes('no encontrado') || msg.includes('no encontrada')) return 404;
   if (msg.includes('no tienes acceso') || msg.includes('restringido')) return 403;
+  if (
+    msg.includes('no puedes') ||
+    msg.includes('no está disponible') ||
+    msg.includes('ya está reservado') ||
+    msg.includes('es requerido') ||
+    msg.includes('inválid')
+  ) {
+    return 400;
+  }
 
   return 500;
 }

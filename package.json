@@ -1,6 +1,9 @@
 {
   "name": "repiensa-tech",
   "private": true,
+  "devDependencies": {
+    "newman": "^6.2.1"
+  },
   "scripts": {
     "dev": "npm run dev --prefix frontend",
     "dev:frontend": "npm run dev --prefix frontend",
@@ -13,6 +16,10 @@
     "db:migrate": "npm run db:migrate --prefix backend",
     "db:seed": "npm run db:seed --prefix backend",
     "test:e2e": "npm run test:e2e --prefix frontend",
+    "postman:generate": "node scripts/generate-postman-collection.js",
+    "test:api": "node scripts/run-api-tests.js",
+    "test:api:report": "node scripts/run-api-tests.js --reporter cli,json --export postman/results/newman.json",
+    "test:api:docker": "docker compose --profile api run --rm newman",
     "test:load:smoke": "docker compose --profile load run --rm k6 run /scripts/smoke.js",
     "test:load": "docker compose --profile load run --rm k6 run /scripts/api-load.js",
     "sonar:up": "docker compose --profile sonar up -d sonarqube",
