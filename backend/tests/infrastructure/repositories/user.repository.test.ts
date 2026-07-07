@@ -8,13 +8,19 @@ let mongoServer: MongoMemoryServer;
 
 describe('user.repository (MongoDB)', () => {
   beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
+    mongoServer = await MongoMemoryServer.create({
+      instance: {
+        launchTimeout: 120_000,
+      },
+    });
     await mongoose.connect(mongoServer.getUri());
   });
 
   afterAll(async () => {
     await mongoose.disconnect();
-    await mongoServer.stop();
+    if (mongoServer) {
+      await mongoServer.stop();
+    }
   });
 
   beforeEach(async () => {
