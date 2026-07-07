@@ -29,4 +29,14 @@ export const authController = {
 
     res.status(200).json(result);
   },
+
+  async getUsersByUniversity(req: AuthRequest, res: Response): Promise<void> {
+    if (!req.user) {
+      res.status(401).json({ message: 'Usuario no autenticado' });
+      return;
+    }
+
+    const users = await userService.getByUniversity(req.user.universityId);
+    res.status(200).json(users);
+  },
 };

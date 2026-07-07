@@ -38,6 +38,11 @@ export const userRepository = {
     return users.map(mapUser);
   },
 
+  async findByUniversity(universityId: string): Promise<User[]> {
+    const users = await UserModel.find({ university_id: universityId }).sort({ full_name: 1 }).exec();
+    return users.map(mapUser);
+  },
+
   async create(data: CreateUserDTO & { password_hash: string }): Promise<User> {
     try {
       const user = await UserModel.create({

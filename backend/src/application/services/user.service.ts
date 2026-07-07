@@ -81,6 +81,11 @@ export const userService = {
 
     return { message: 'Contraseña actualizada correctamente' };
   },
+
+  async getByUniversity(universityId: string) {
+    const users = await userRepository.findByUniversity(universityId);
+    return users.map(sanitizeUser);
+  },
 };
 
 function sanitizeUser(user: User) {

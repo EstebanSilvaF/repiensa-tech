@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AppNavbar from '../components/layout/AppNavbar'
+import { authService } from '../api/authService'
 import { productService } from '../api/productService'
 import { transactionService } from '../api/transactionService'
 import { useAuth } from '../hooks/useAuth'
 import { paths } from '../routes/paths'
-import type { Product, Transaction } from '../types/api'
+import type { Product, Transaction, User } from '../types/api'
 
 interface LibraryProductItem extends Product {
   kind: 'product'
@@ -28,9 +29,11 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
   const [products, setProducts] = useState<Product[]>([])
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
+  const [selectedBuyerId, setSelectedBuyerId] = useState<string>('')
 
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
@@ -45,15 +48,18 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
     setError(null)
 
     try {
-      const [allProducts, history] = await Promise.all([
+      const [allProducts, history, universityUsers] = await Promise.all([
         productService.getProducts(),
         transactionService.getTransactions(),
+        authService.getUsersByUniversity(),
       ])
 
       const universityProducts = allProducts.filter(
         (product) => product.university_id === user.university_id,
       )
       setProducts(universityProducts)
+      setUsers(universityUsers)
+      setSelectedBuyerId((current) => current || universityUsers.find((candidate) => candidate.id === user.id)?.id || universityUsers[0]?.id || '')
       setTransactions(history.map((tx) => ({
         ...tx,
         product_name: tx.product_name ?? 'Producto',
@@ -123,10 +129,15 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
   }
 
   async function handleAcquire(productId: string) {
+    if (!selectedBuyerId) {
+      setError('Selecciona un adquiriente antes de confirmar')
+      return
+    }
+
     if (!window.confirm('¿Marcar este producto como adquirido?')) return
 
     try {
-      await productService.acquireProduct(productId)
+      await productService.acquireProduct(productId, selectedBuyerId)
       await loadData()
     } catch {
       setError('No se pudo marcar el producto como adquirido')
@@ -203,6 +214,18 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
                 <div className="history-item__aside">
                   {item.kind !== 'transaction' && (
                     <>
+                      <select
+                        className="history-page__filter"
+                        value={selectedBuyerId}
+                        onChange={(event) => setSelectedBuyerId(event.target.value)}
+                        aria-label="Seleccionar adquiriente"
+                      >
+                        {users.map((candidate) => (
+                          <option key={candidate.id} value={candidate.id}>
+                            {candidate.full_name}
+                          </option>
+                        ))}
+                      </select>
                       <button type="button" className="history-page__filter" onClick={() => handleAcquire(item.id)}>
                         Adquirido
                       </button>

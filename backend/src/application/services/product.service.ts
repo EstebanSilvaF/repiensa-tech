@@ -1,5 +1,6 @@
 import { productRepository } from '../../infrastructure/persistence/repositories/product.repository';
 import { transactionRepository } from '../../infrastructure/persistence/repositories/transaction.repository';
+import { userRepository } from '../../infrastructure/persistence/repositories/user.repository';
 import { expandSearchTerms } from '../../infrastructure/config/ai';
 import { uploadService } from './upload.service';
 import { CreateProductDTO, ProductFilters } from '../../domain/types/product.types';
@@ -59,6 +60,15 @@ export const productService = {
   async markAsAcquired(productId: string, buyerId: string) {
     const product = await productRepository.findById(productId);
     assertProductExists(product);
+
+    const buyer = await userRepository.findById(buyerId);
+    if (!buyer) {
+      throw new Error('El adquiriente no existe');
+    }
+
+    if (buyer.university_id !== product.university_id) {
+      throw new Error('El adquiriente debe pertenecer a la misma universidad');
+    }
 
     await productRepository.updateStatus(productId, 'sold');
     await transactionRepository.createForProduct({
