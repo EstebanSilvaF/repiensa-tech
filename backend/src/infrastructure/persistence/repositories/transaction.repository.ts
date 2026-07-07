@@ -94,4 +94,30 @@ export const transactionRepository = {
       });
     });
   },
+
+  async createForProduct(params: {
+    productId: string;
+    sellerId: string;
+    buyerId: string;
+    finalPrice: number;
+  }): Promise<void> {
+    const chat = await prisma.chat.create({
+      data: {
+        productId: params.productId,
+        sellerId: params.sellerId,
+        buyerId: params.buyerId,
+        status: 'delivery_confirmed',
+      },
+    });
+
+    await prisma.transaction.create({
+      data: {
+        productId: params.productId,
+        sellerId: params.sellerId,
+        buyerId: params.buyerId,
+        finalPrice: params.finalPrice,
+        chatId: chat.id,
+      },
+    });
+  },
 };

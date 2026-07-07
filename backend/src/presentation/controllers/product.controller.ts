@@ -62,4 +62,9 @@ export const productController = {
     await productService.delete(req.params.id as string, req.user!.userId);
     res.json({ message: 'Producto eliminado' });
   },
+
+  async acquire(req: AuthRequest, res: Response): Promise<void> {
+    const result = await productService.markAsAcquired(req.params.id as string, req.user!.userId);
+    res.json(result);
+  },
 };

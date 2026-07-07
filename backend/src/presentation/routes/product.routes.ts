@@ -21,6 +21,7 @@ router.post('/generate-description', (req, res, next) => {
 });
 router.get('/:id',     asyncHandler(productController.getById));
 router.post('/',       asyncHandler(productController.create));
+router.patch('/:id/acquire', asyncHandler(productController.acquire));
 router.delete('/:id',  asyncHandler(productController.remove));
 
 export default router;

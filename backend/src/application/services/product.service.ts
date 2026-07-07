@@ -1,4 +1,5 @@
 import { productRepository } from '../../infrastructure/persistence/repositories/product.repository';
+import { transactionRepository } from '../../infrastructure/persistence/repositories/transaction.repository';
 import { expandSearchTerms } from '../../infrastructure/config/ai';
 import { uploadService } from './upload.service';
 import { CreateProductDTO, ProductFilters } from '../../domain/types/product.types';
@@ -53,5 +54,20 @@ export const productService = {
         // La imagen en Cloudinary se limpia en segundo plano; el producto ya se eliminó en BD
       }
     }
+  },
+
+  async markAsAcquired(productId: string, buyerId: string) {
+    const product = await productRepository.findById(productId);
+    assertProductExists(product);
+
+    await productRepository.updateStatus(productId, 'sold');
+    await transactionRepository.createForProduct({
+      productId,
+      sellerId: product.seller_id,
+      buyerId,
+      finalPrice: product.price,
+    });
+
+    return { message: 'Producto marcado como adquirido' };
   },
 };
