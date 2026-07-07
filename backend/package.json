@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "postinstall": "prisma generate",
     "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "db:migrate": "prisma migrate dev",
@@ -48,6 +49,7 @@
     "@types/node": "^25.9.1",
     "@types/node-cron": "^3.0.11",
     "@types/swagger-ui-express": "^4.1.8",
+    "@vitest/coverage-v8": "^4.1.10",
     "mongodb-memory-server": "^11.2.0",
     "nodemon": "^3.1.14",
     "prisma": "^6.19.3",

@@ -12,6 +12,12 @@
     "install:all": "npm install --prefix frontend && npm install --prefix backend",
     "db:migrate": "npm run db:migrate --prefix backend",
     "db:seed": "npm run db:seed --prefix backend",
-    "test:e2e": "npm run test:e2e --prefix frontend"
+    "test:e2e": "npm run test:e2e --prefix frontend",
+    "test:load:smoke": "docker compose --profile load run --rm k6 run /scripts/smoke.js",
+    "test:load": "docker compose --profile load run --rm k6 run /scripts/api-load.js",
+    "sonar:up": "docker compose --profile sonar up -d sonarqube",
+    "sonar:coverage": "npm run test:coverage --prefix backend && node backend/scripts/fix-lcov-for-sonar.js",
+    "sonar:scan": "docker compose --profile sonar run --rm sonar-scanner",
+    "sonar": "npm run sonar:coverage && npm run sonar:scan"
   }
 }
