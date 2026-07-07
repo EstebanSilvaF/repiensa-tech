@@ -48,6 +48,25 @@ export interface CompleteSaleParams {
 }
 
 export const transactionRepository = {
+  async findAll(): Promise<TransactionWithDetails[]> {
+    const rows = await prisma.transaction.findMany({
+      include: {
+        product: { select: { name: true, imageUrl: true, category: true } },
+      },
+      orderBy: { confirmedAt: 'desc' },
+    });
+
+    return rows.map((row) => ({
+      ...mapTransaction(row),
+      product_name: row.product.name,
+      product_image: row.product.imageUrl,
+      product_category: row.product.category,
+      buyer_name: '',
+      seller_name: '',
+      direction: 'sale',
+    }));
+  },
+
   async findByUser(userId: string): Promise<TransactionWithDetails[]> {
     const rows = await prisma.transaction.findMany({
       where: {

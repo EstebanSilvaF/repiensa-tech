@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { reservationService } from '../api/reservationService'
+import { useAuth } from '../hooks/useAuth'
 import { transactionService } from '../api/transactionService'
 import AppNavbar from '../components/layout/AppNavbar'
 import ImagePlaceholderIcon from '../components/icons/ImagePlaceholderIcon'
-import { useAuth } from '../hooks/useAuth'
 import { paths } from '../routes/paths'
 import type { Transaction, TransactionFilter } from '../types/api'
 import {
@@ -59,7 +59,7 @@ function transactionMeta(tx: Transaction): string {
 }
 
 export default function HistoryPage() {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
   const navigate = useNavigate()
   const [filter, setFilter] = useState<TransactionFilter>('all')
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -73,7 +73,7 @@ export default function HistoryPage() {
   }, [isAuthenticated, isAuthLoading, navigate])
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated || user?.role !== 'library') return
 
     let cancelled = false
 
@@ -111,7 +111,7 @@ export default function HistoryPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, user?.role])
 
   const filtered = useMemo(() => {
     if (filter === 'all') return transactions
@@ -151,6 +151,17 @@ export default function HistoryPage() {
       <div className="history-page">
         <AppNavbar />
         <p className="history-page__status">Cargando...</p>
+      </div>
+    )
+  }
+
+  if (user?.role !== 'library') {
+    return (
+      <div className="history-page">
+        <AppNavbar />
+        <main className="history-page__main">
+          <p className="history-page__status">Esta vista es exclusiva para la biblioteca.</p>
+        </main>
       </div>
     )
   }
