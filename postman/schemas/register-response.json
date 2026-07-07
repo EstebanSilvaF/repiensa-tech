@@ -1,0 +1,16 @@
+{
+  "type": "object",
+  "required": ["message", "user"],
+  "properties": {
+    "message": { "type": "string" },
+    "user": {
+      "type": "object",
+      "required": ["id", "email", "role"],
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" }
+      }
+    }
+  }
+}

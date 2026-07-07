@@ -1,6 +1,7 @@
 import { reservationRepository } from '../../infrastructure/persistence/repositories/reservation.repository';
 import { productRepository } from '../../infrastructure/persistence/repositories/product.repository';
 import { validateProductReservation } from '../../domain/validators/reservation.validator';
+import { createHttpError } from '../../presentation/middlewares/error.middleware';
 
 const RESERVATION_FEE  = 2000;
 const RESERVATION_DAYS = 7;
@@ -14,7 +15,12 @@ export const reservationService = {
     const product = await productRepository.findById(productId);
     const existing = await reservationRepository.findActiveByProduct(productId);
 
-    validateProductReservation(product, buyerId, !!existing);
+    try {
+      validateProductReservation(product, buyerId, !!existing);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'No se pudo reservar el producto';
+      throw createHttpError(400, message);
+    }
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + RESERVATION_DAYS);

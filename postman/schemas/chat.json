@@ -1,0 +1,11 @@
+{
+  "type": "object",
+  "required": ["id", "product_id", "buyer_id", "seller_id", "status"],
+  "properties": {
+    "id": { "type": "string" },
+    "product_id": { "type": "string" },
+    "buyer_id": { "type": "string" },
+    "seller_id": { "type": "string" },
+    "status": { "type": "string", "enum": ["open", "delivery_confirmed"] }
+  }
+}
