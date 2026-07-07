@@ -11,6 +11,7 @@ const PRODUCT_2_ID = 'clprodsensor001';
 
 const ADMIN_PASSWORD_HASH = '$2b$10$E1zYbUfaQQr49FfOMSBIe.ossGjfJrhDMvC25yIUOEyHIePqy8zYm';
 const STUDENT_PASSWORD_HASH = '$2b$10$YAIo7YHyOLFwcmUbHsZdaul.EVuVv6uFCPbcU1ikNmChQS34ndDuW';
+const LIBRARY_PASSWORD_HASH = '$2b$10$V7k5cY8zVjJxZJ3g8L6lM.jPNL9X0Y5UzF8v3kzJXx5i0xWQf6T0y';
 
 async function clearPostgresSeedData(): Promise<void> {
   await prisma.transaction.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
@@ -64,7 +65,7 @@ async function main(): Promise<void> {
       university_id: UNIVERSITY_ID,
       full_name: 'Biblioteca Universitaria',
       email: 'biblioteca@uniempresarial.edu.co',
-      password_hash: STUDENT_PASSWORD_HASH,
+      password_hash: LIBRARY_PASSWORD_HASH,
       role: 'library',
     },
   ]);
