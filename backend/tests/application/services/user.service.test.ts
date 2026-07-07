@@ -66,6 +66,29 @@ describe('user.service', () => {
       expect(user.email).toBe('ana@uni.edu');
     });
 
+    it('permite registrar un usuario con rol biblioteca', async () => {
+      findByEmail.mockResolvedValue(null);
+      findUniversityById.mockResolvedValue({
+        id: 'uni-1',
+        subscription_status: 'active',
+        email_domain: 'uni.edu',
+      });
+      create.mockResolvedValue({
+        id: 'user-2',
+        ...dto,
+        password_hash: 'hashed',
+        role: 'library',
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
+
+      await userService.register({ ...dto, role: 'library' as any });
+
+      expect(create).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'library' }),
+      );
+    });
+
     it('rechaza registro con contraseña corta', async () => {
       await expect(
         userService.register({ ...dto, password: 'corta' })

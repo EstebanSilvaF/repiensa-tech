@@ -45,6 +45,7 @@ export const userRepository = {
         full_name: data.full_name,
         email: data.email,
         password_hash: data.password_hash,
+        role: data.role ?? 'student',
       });
       return mapUser(user);
     } catch (error) {

@@ -17,6 +17,7 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState<'student' | 'library'>('student')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -82,6 +83,7 @@ export default function RegisterPage() {
         full_name: fullName,
         email,
         password,
+        role,
       })
       navigate(paths.login)
     } catch (err) {
@@ -194,6 +196,21 @@ export default function RegisterPage() {
                   Debe terminar en @{selectedUniversity.email_domain}
                 </p>
               )}
+            </div>
+
+            <div className="register-form__field">
+              <label htmlFor="role" className="register-form__label">
+                Tipo de usuario
+              </label>
+              <select
+                id="role"
+                className="register-form__input register-form__select"
+                value={role}
+                onChange={(e) => setRole(e.target.value as 'student' | 'library')}
+              >
+                <option value="student">Estudiante</option>
+                <option value="library">Biblioteca</option>
+              </select>
             </div>
 
             <div className="register-form__field">

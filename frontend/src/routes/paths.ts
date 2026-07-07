@@ -8,6 +8,9 @@ export const paths = {
   favorites: '/favorites',
   profile: '/profile',
   chat: '/chat',
+  library: '/biblioteca',
+  libraryUploads: '/biblioteca/subidos',
+  libraryDelivered: '/biblioteca/entregados',
   chatWithId: (id: string) => `/chat?chatId=${id}`,
   productDetail: (id: string) => `/producto/${id}`,
 } as const

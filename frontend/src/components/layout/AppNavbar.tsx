@@ -13,6 +13,19 @@ const navLinks = [
   { label: 'Historial', to: paths.history },
 ]
 
+function getVisibleNavLinks(userRole?: string) {
+  if (userRole === 'library') {
+    return [
+      { label: 'Inicio', to: paths.gallery },
+      { label: 'Biblioteca', to: paths.library },
+      { label: 'Subidos', to: paths.libraryUploads },
+      { label: 'Entregados', to: paths.libraryDelivered },
+    ]
+  }
+
+  return navLinks
+}
+
 export default function AppNavbar() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
@@ -55,7 +68,7 @@ export default function AppNavbar() {
       </Link>
 
       <nav className="app-navbar__nav" aria-label="Navegación principal">
-        {navLinks.map((link) => {
+        {getVisibleNavLinks(user?.role).map((link) => {
           const isActive = pathname === link.to
 
           return (

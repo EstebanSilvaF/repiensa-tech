@@ -34,7 +34,11 @@ export const userService = {
     validateEmailBelongsToUniversity(data.email, university.email_domain);
 
     const password_hash = await bcrypt.hash(data.password, SALT_ROUNDS);
-    const user = await userRepository.create({ ...data, password_hash });
+    const user = await userRepository.create({
+      ...data,
+      role: data.role ?? 'student',
+      password_hash,
+    });
 
     return sanitizeUser(user);
   },

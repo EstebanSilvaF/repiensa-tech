@@ -38,7 +38,7 @@ async function main(): Promise<void> {
     },
   });
 
-  const [admin, maria, carlos] = await UserModel.create([
+  const [admin, maria, carlos, biblioteca] = await UserModel.create([
     {
       university_id: UNIVERSITY_ID,
       full_name: 'Admin Repensa',
@@ -59,6 +59,13 @@ async function main(): Promise<void> {
       email: 'carlos.mendoza@uniempresarial.edu.co',
       password_hash: STUDENT_PASSWORD_HASH,
       role: 'student',
+    },
+    {
+      university_id: UNIVERSITY_ID,
+      full_name: 'Biblioteca Universitaria',
+      email: 'biblioteca@uniempresarial.edu.co',
+      password_hash: STUDENT_PASSWORD_HASH,
+      role: 'library',
     },
   ]);
 
@@ -101,6 +108,7 @@ async function main(): Promise<void> {
   console.log(`Admin ID (MongoDB): ${admin._id.toString()}`);
   console.log(`María ID (MongoDB): ${mariaId}`);
   console.log(`Carlos ID (MongoDB): ${carlos._id.toString()}`);
+  console.log(`Biblioteca ID (MongoDB): ${biblioteca._id.toString()}`);
 }
 
 main()
