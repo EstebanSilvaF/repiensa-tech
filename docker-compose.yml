@@ -1,0 +1,148 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: repensa-postgres
+    restart: always
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: repensa
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:8
+    container_name: repensa-mongo
+    restart: always
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+
+    build:
+      context: ./backend
+
+    container_name: repensa-backend
+
+    restart: always
+
+    depends_on:
+      - postgres
+      - mongodb
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/repensa
+      MONGO_URI: mongodb://mongodb:27017/repensatech
+      CORS_ORIGIN: http://localhost:5173,http://127.0.0.1:5173
+
+    ports:
+      - "3000:3000"
+
+  frontend:
+
+    build:
+      context: ./frontend
+
+    container_name: repensa-frontend
+
+    restart: always
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:80"
+
+  newman:
+    image: postman/newman:alpine
+    container_name: repensa-newman
+    profiles:
+      - api
+    depends_on:
+      - backend
+    volumes:
+      - ./repensa-postman-collection.json:/etc/newman/repensa-postman-collection.json:ro
+      - ./postman:/etc/newman/postman:ro
+    command:
+      - run
+      - /etc/newman/repensa-postman-collection.json
+      - -e
+      - /etc/newman/postman/repensa-docker.environment.json
+      - --delay-request
+      - "150"
+      - --color
+      - "on"
+
+  k6:
+    image: grafana/k6:0.57.0
+    container_name: repensa-k6
+    profiles:
+      - load
+    depends_on:
+      - backend
+    environment:
+      BASE_URL: http://backend:3000
+      K6_TEST_USER: maria.rodriguez@uniempresarial.edu.co
+      K6_TEST_PASSWORD: Estudiante1!
+      K6_PRODUCT_ID: clprodarduino001
+    volumes:
+      - ./k6:/scripts
+    entrypoint: ["k6"]
+
+  sonarqube:
+
+    image: sonarqube:lts-community
+
+    container_name: sonarqube
+
+    profiles:
+      - sonar
+
+    restart: always
+
+    ports:
+      - "9000:9000"
+
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    profiles:
+      - sonar
+    depends_on:
+      - sonarqube
+    environment:
+      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_TOKEN: ${SONAR_TOKEN}
+      SONAR_LOGIN: ${SONAR_TOKEN}
+    volumes:
+      - .:/usr/src
+    working_dir: /usr/src
+
+volumes:
+
+  postgres_data:
+
+  mongo_data:
+
+  sonarqube_data:
+
+  sonarqube_logs:
+
+  sonarqube_extensions:
