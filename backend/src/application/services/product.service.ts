@@ -1,4 +1,7 @@
 import { productRepository } from '../../infrastructure/persistence/repositories/product.repository';
+import { transactionRepository } from '../../infrastructure/persistence/repositories/transaction.repository';
+import { userRepository } from '../../infrastructure/persistence/repositories/user.repository';
+import { expandSearchTerms } from '../../infrastructure/config/ai';
 import { uploadService } from './upload.service';
 import { CreateProductDTO, ProductFilters } from '../../domain/types/product.types';
 import {
@@ -10,7 +13,14 @@ import { enrichProductsWithSeller } from '../helpers/user-profile.helper';
 
 export const productService = {
   async getAll(universityId: string, filters: ProductFilters) {
-    const products = await productRepository.findAll(universityId, filters);
+    const searchTerms = filters.search?.trim()
+      ? await expandSearchTerms(filters.search)
+      : undefined;
+
+    const products = await productRepository.findAll(universityId, {
+      ...filters,
+      searchTerms,
+    });
     return enrichProductsWithSeller(products);
   },
 
@@ -45,5 +55,29 @@ export const productService = {
         // La imagen en Cloudinary se limpia en segundo plano; el producto ya se eliminó en BD
       }
     }
+  },
+
+  async markAsAcquired(productId: string, buyerId: string) {
+    const product = await productRepository.findById(productId);
+    assertProductExists(product);
+
+    const buyer = await userRepository.findById(buyerId);
+    if (!buyer) {
+      throw new Error('El adquiriente no existe');
+    }
+
+    if (buyer.university_id !== product.university_id) {
+      throw new Error('El adquiriente debe pertenecer a la misma universidad');
+    }
+
+    await productRepository.updateStatus(productId, 'sold');
+    await transactionRepository.createForProduct({
+      productId,
+      sellerId: product.seller_id,
+      buyerId,
+      finalPrice: product.price,
+    });
+
+    return { message: 'Producto marcado como adquirido' };
   },
 };

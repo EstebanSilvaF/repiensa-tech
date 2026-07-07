@@ -17,7 +17,7 @@ const userSchema = new Schema<UserDocument>(
     full_name: { type: String, required: true, maxlength: 150 },
     email: { type: String, required: true, unique: true, maxlength: 254 },
     password_hash: { type: String, required: true },
-    role: { type: String, enum: ['student', 'admin'], default: 'student' },
+    role: { type: String, enum: ['student', 'admin', 'library'], default: 'student' },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { reservationService } from '../api/reservationService'
+import { useAuth } from '../hooks/useAuth'
 import { transactionService } from '../api/transactionService'
 import AppNavbar from '../components/layout/AppNavbar'
 import ImagePlaceholderIcon from '../components/icons/ImagePlaceholderIcon'
-import { useAuth } from '../hooks/useAuth'
 import { paths } from '../routes/paths'
 import type { Transaction, TransactionFilter } from '../types/api'
 import {
@@ -59,7 +59,7 @@ function transactionMeta(tx: Transaction): string {
 }
 
 export default function HistoryPage() {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
   const navigate = useNavigate()
   const [filter, setFilter] = useState<TransactionFilter>('all')
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -73,7 +73,7 @@ export default function HistoryPage() {
   }, [isAuthenticated, isAuthLoading, navigate])
 
   useEffect(() => {
-    if (!isAuthenticated) return
+    if (!isAuthenticated || user?.role !== 'library') return
 
     let cancelled = false
 
@@ -111,7 +111,7 @@ export default function HistoryPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, user?.role])
 
   const filtered = useMemo(() => {
     if (filter === 'all') return transactions
@@ -122,6 +122,15 @@ export default function HistoryPage() {
     () => buildHistorySummary(transactions),
     [transactions],
   )
+
+  function handleBack() {
+    if (window.history.length > 1) {
+      navigate(-1)
+      return
+    }
+
+    navigate(paths.profile, { replace: true })
+  }
 
   const grouped = useMemo(() => {
     const map = new Map<string, Transaction[]>()
@@ -146,14 +155,25 @@ export default function HistoryPage() {
     )
   }
 
+  if (user?.role !== 'library') {
+    return (
+      <div className="history-page">
+        <AppNavbar />
+        <main className="history-page__main">
+          <p className="history-page__status">Esta vista es exclusiva para la biblioteca.</p>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className="history-page">
       <AppNavbar />
 
       <main className="history-page__main">
-        <Link to={paths.gallery} className="history-page__back">
+        <button type="button" className="history-page__back" onClick={handleBack}>
           ← Volver
-        </Link>
+        </button>
 
         <header className="history-page__header">
           <h1 className="history-page__title">Historial</h1>

@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'admin'
+export type UserRole = 'student' | 'admin' | 'library'
 
 export type ProductCondition = 'new' | 'good' | 'regular'
 export type ProductStatus = 'available' | 'reserved' | 'sold'
@@ -9,7 +9,18 @@ export type ProductCategory =
   | 'displays'
   | 'cables'
   | 'power'
-  | 'other'
+  | 'books_notes'
+  | 'lab_science'
+  | 'art_design'
+  | 'tools_hardware'
+  | 'sports_fitness'
+  | 'clothing_accessories'
+  | 'furniture_decor'
+  | 'musical_instruments'
+  | 'stationery_office'
+  | 'home_kitchen'
+  | 'services'
+  | 'other';
 
 export type SubscriptionStatus = 'active' | 'inactive' | 'expired'
 
@@ -83,6 +94,7 @@ export interface RegisterRequest {
   full_name: string
   email: string
   password: string
+  role?: UserRole
 }
 
 export interface LoginRequest {

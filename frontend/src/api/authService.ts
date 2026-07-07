@@ -5,6 +5,7 @@ import type {
   LoginResponse,
   RegisterRequest,
   RegisterResponse,
+  User,
 } from '../types/api'
 import { apiClient } from './client'
 
@@ -25,4 +26,6 @@ export const authService = {
     apiClient.patch<ChangePasswordResponse>('/auth/change-password', {
       body: data,
     }),
+
+  getUsersByUniversity: () => apiClient.get<User[]>('/auth/users'),
 }

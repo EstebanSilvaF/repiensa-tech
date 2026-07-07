@@ -154,6 +154,15 @@ export default function PublishProductPage() {
     }
   }
 
+  function handleBack() {
+    if (window.history.length > 1) {
+      navigate(-1)
+      return
+    }
+
+    navigate(paths.gallery, { replace: true })
+  }
+
   const previewName = name.trim() || 'Nombre del producto'
   const previewDescription = description.trim()
   const previewPrice = isDonation ? 0 : Number(price) || 0
@@ -173,9 +182,9 @@ export default function PublishProductPage() {
       <AppNavbar />
 
       <main className="publish-page__main">
-        <Link to={paths.gallery} className="publish-page__back">
+        <button type="button" className="publish-page__back" onClick={handleBack}>
           ← Volver
-        </Link>
+        </button>
 
         <h1 className="publish-page__title">Publicar producto</h1>
 

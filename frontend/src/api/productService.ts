@@ -115,6 +115,15 @@ export const productService = {
   createProduct: (data: CreateProductRequest) =>
     apiClient.post<Product>('/products', { body: data }),
 
+  getMyProducts: () => apiClient.get<Product[]>('/products/mine'),
+
+  acquireProduct: (id: string, buyerId: string) =>
+    apiClient.patch<{ message: string }>(`/products/${id}/acquire`, {
+      body: { buyer_id: buyerId },
+    }),
+
+  deleteProduct: (id: string) => apiClient.delete<{ message: string }>(`/products/${id}`),
+
   uploadProductImage,
 
   generateDescription,

@@ -19,6 +19,17 @@ const categoryLabels: Record<ProductCategory, string> = {
   displays: 'Displays',
   cables: 'Cables',
   power: 'Energía',
+  books_notes: 'Libros y Apuntes',
+  lab_science: 'Laboratorio y Ciencias',
+  art_design: 'Arte y Diseño',
+  tools_hardware: 'Herramientas',
+  sports_fitness: 'Deporte y Fitness',
+  clothing_accessories: 'Ropa y Accesorios',
+  furniture_decor: 'Muebles y Decoración',
+  musical_instruments: 'Instrumentos Musicales',
+  stationery_office: 'Papelería y Oficina',
+  home_kitchen: 'Cocina y Hogar',
+  services: 'Servicios',
   other: 'Otros',
 }
 

@@ -11,11 +11,22 @@ const PRODUCT_2_ID = 'clprodsensor001';
 
 const ADMIN_PASSWORD_HASH = '$2b$10$E1zYbUfaQQr49FfOMSBIe.ossGjfJrhDMvC25yIUOEyHIePqy8zYm';
 const STUDENT_PASSWORD_HASH = '$2b$10$YAIo7YHyOLFwcmUbHsZdaul.EVuVv6uFCPbcU1ikNmChQS34ndDuW';
+const LIBRARY_PASSWORD_HASH = '$2b$10$Esw6yh1E1HysOHrOxdbgOukezkFWAJ8wAgqyFoIxw68F7Gke8EaRi';
+
+async function clearPostgresSeedData(): Promise<void> {
+  await prisma.transaction.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
+  await prisma.message.deleteMany({ where: { chat: { product: { universityId: UNIVERSITY_ID } } } });
+  await prisma.chat.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
+  await prisma.reservation.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
+  await prisma.product.deleteMany({ where: { universityId: UNIVERSITY_ID } });
+  await prisma.university.deleteMany({ where: { id: UNIVERSITY_ID } });
+}
 
 async function main(): Promise<void> {
   await connectMongo();
 
   await UserModel.deleteMany({});
+  await clearPostgresSeedData();
 
   await prisma.university.create({
     data: {
@@ -28,7 +39,7 @@ async function main(): Promise<void> {
     },
   });
 
-  const [admin, maria, carlos] = await UserModel.create([
+  const [admin, maria, carlos, biblioteca] = await UserModel.create([
     {
       university_id: UNIVERSITY_ID,
       full_name: 'Admin Repensa',
@@ -49,6 +60,13 @@ async function main(): Promise<void> {
       email: 'carlos.mendoza@uniempresarial.edu.co',
       password_hash: STUDENT_PASSWORD_HASH,
       role: 'student',
+    },
+    {
+      university_id: UNIVERSITY_ID,
+      full_name: 'Biblioteca Universitaria',
+      email: 'biblioteca@uniempresarial.edu.co',
+      password_hash: LIBRARY_PASSWORD_HASH,
+      role: 'library',
     },
   ]);
 
@@ -91,6 +109,7 @@ async function main(): Promise<void> {
   console.log(`Admin ID (MongoDB): ${admin._id.toString()}`);
   console.log(`María ID (MongoDB): ${mariaId}`);
   console.log(`Carlos ID (MongoDB): ${carlos._id.toString()}`);
+  console.log(`Biblioteca ID (MongoDB): ${biblioteca._id.toString()}`);
 }
 
 main()

@@ -4,8 +4,8 @@ import { AuthRequest } from '../middlewares/auth.middleware';
 
 export const authController = {
   async register(req: Request, res: Response): Promise<void> {
-    const { university_id, full_name, email, password } = req.body;
-    const user = await userService.register({ university_id, full_name, email, password });
+    const { university_id, full_name, email, password, role } = req.body;
+    const user = await userService.register({ university_id, full_name, email, password, role });
     res.status(201).json({ message: 'Cuenta creada exitosamente', user });
   },
 
@@ -28,5 +28,15 @@ export const authController = {
     });
 
     res.status(200).json(result);
+  },
+
+  async getUsersByUniversity(req: AuthRequest, res: Response): Promise<void> {
+    if (!req.user) {
+      res.status(401).json({ message: 'Usuario no autenticado' });
+      return;
+    }
+
+    const users = await userService.getByUniversity(req.user.universityId);
+    res.status(200).json(users);
   },
 };

@@ -48,6 +48,25 @@ export interface CompleteSaleParams {
 }
 
 export const transactionRepository = {
+  async findAll(): Promise<TransactionWithDetails[]> {
+    const rows = await prisma.transaction.findMany({
+      include: {
+        product: { select: { name: true, imageUrl: true, category: true } },
+      },
+      orderBy: { confirmedAt: 'desc' },
+    });
+
+    return rows.map((row) => ({
+      ...mapTransaction(row),
+      product_name: row.product.name,
+      product_image: row.product.imageUrl,
+      product_category: row.product.category,
+      buyer_name: '',
+      seller_name: '',
+      direction: 'sale',
+    }));
+  },
+
   async findByUser(userId: string): Promise<TransactionWithDetails[]> {
     const rows = await prisma.transaction.findMany({
       where: {
@@ -92,6 +111,32 @@ export const transactionRepository = {
           finalPrice: params.finalPrice,
         },
       });
+    });
+  },
+
+  async createForProduct(params: {
+    productId: string;
+    sellerId: string;
+    buyerId: string;
+    finalPrice: number;
+  }): Promise<void> {
+    const chat = await prisma.chat.create({
+      data: {
+        productId: params.productId,
+        sellerId: params.sellerId,
+        buyerId: params.buyerId,
+        status: 'delivery_confirmed',
+      },
+    });
+
+    await prisma.transaction.create({
+      data: {
+        productId: params.productId,
+        sellerId: params.sellerId,
+        buyerId: params.buyerId,
+        finalPrice: params.finalPrice,
+        chatId: chat.id,
+      },
     });
   },
 };

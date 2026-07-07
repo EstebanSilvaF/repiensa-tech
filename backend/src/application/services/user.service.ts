@@ -34,7 +34,11 @@ export const userService = {
     validateEmailBelongsToUniversity(data.email, university.email_domain);
 
     const password_hash = await bcrypt.hash(data.password, SALT_ROUNDS);
-    const user = await userRepository.create({ ...data, password_hash });
+    const user = await userRepository.create({
+      ...data,
+      role: data.role ?? 'student',
+      password_hash,
+    });
 
     return sanitizeUser(user);
   },
@@ -76,6 +80,11 @@ export const userService = {
     await userRepository.updatePassword(userId, password_hash);
 
     return { message: 'Contraseña actualizada correctamente' };
+  },
+
+  async getByUniversity(universityId: string) {
+    const users = await userRepository.findByUniversity(universityId);
+    return users.map(sanitizeUser);
   },
 };
 

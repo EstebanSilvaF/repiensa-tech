@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'admin';
+export type UserRole = 'student' | 'admin' | 'library';
 
 export interface User {
   id: string;
@@ -16,6 +16,7 @@ export interface CreateUserDTO {
   full_name: string;
   email: string;
   password: string;
+  role?: UserRole;
 }
 
 export interface LoginDTO {

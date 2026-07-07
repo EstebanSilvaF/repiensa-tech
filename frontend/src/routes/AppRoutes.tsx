@@ -9,6 +9,7 @@ import ProfilePage from '../pages/ProfilePage'
 import PublishProductPage from '../pages/PublishProductPage'
 import RegisterPage from '../pages/RegisterPage'
 import StartPage from '../pages/StartPage'
+import LibraryPage from '../pages/LibraryPage'
 import { paths } from './paths'
 
 export default function AppRoutes() {
@@ -25,6 +26,8 @@ export default function AppRoutes() {
       <Route path={paths.favorites} element={<FavoritesPage />} />
       <Route path={paths.profile} element={<ProfilePage />} />
       <Route path={paths.chat} element={<ChatPage />} />
+      <Route path={paths.library} element={<LibraryPage />} />
+      <Route path={paths.libraryDelivered} element={<LibraryPage view="delivered" />} />
     </Routes>
   )
 }

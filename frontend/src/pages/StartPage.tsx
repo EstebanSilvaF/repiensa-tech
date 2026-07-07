@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type MouseEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { productService } from '../api/productService'
 import AppFooter from '../components/layout/AppFooter'
@@ -38,6 +38,14 @@ export default function StartPage() {
       navigate(paths.login)
     }
   }, [isAuthenticated, isAuthLoading, navigate])
+
+  function handleToggleFavorite(event: MouseEvent<HTMLButtonElement>, productId: string) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const updated = toggleProductLike(productId)
+    setLikedProductIds(updated)
+  }
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -96,7 +104,7 @@ export default function StartPage() {
           <input
             type="search"
             className="start-page__search-input"
-            placeholder="Busca componentes de hardware o elementos necesarios"
+            placeholder="Busca productos, artículos o servicios..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -138,10 +146,7 @@ export default function StartPage() {
                     type="button"
                     className={`start-page__like-button${liked ? ' start-page__like-button--active' : ''}`}
                     aria-label={liked ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                    onClick={() => {
-                      const updated = toggleProductLike(product.id)
-                      setLikedProductIds(updated)
-                    }}
+                    onClick={(event) => handleToggleFavorite(event, product.id)}
                   >
                     <HeartIcon filled={liked} />
                   </button>
