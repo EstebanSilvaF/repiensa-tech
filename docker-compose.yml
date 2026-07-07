@@ -47,6 +47,52 @@ services:
     depends_on:
       - backend
 
+  k6:
+    image: grafana/k6:0.57.0
+    container_name: repensa-k6
+    profiles:
+      - load
+    depends_on:
+      - backend
+    environment:
+      BASE_URL: http://backend:3000
+      K6_TEST_USER: maria.rodriguez@uniempresarial.edu.co
+      K6_TEST_PASSWORD: Estudiante1!
+      K6_PRODUCT_ID: clprodarduino001
+    volumes:
+      - ./k6:/scripts
+    entrypoint: ["k6"]
+
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: sonarqube
+    profiles:
+      - sonar
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+
+  sonar-scanner:
+    image: sonarsource/sonar-scanner-cli:latest
+    profiles:
+      - sonar
+    depends_on:
+      - sonarqube
+    environment:
+      SONAR_HOST_URL: http://sonarqube:9000
+      SONAR_TOKEN: ${SONAR_TOKEN}
+      SONAR_LOGIN: ${SONAR_TOKEN}
+    volumes:
+      - .:/usr/src
+    working_dir: /usr/src
+
 volumes:
   postgres_data:
   mongo_data:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
