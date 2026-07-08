@@ -13,6 +13,12 @@
   text-decoration: none;
 }
 
+.app-navbar__logo-img {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+}
+
 .app-navbar__nav {
   display: flex;
   align-items: center;

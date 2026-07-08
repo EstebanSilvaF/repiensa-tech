@@ -1,8 +1,10 @@
 import { useEffect, useState, type MouseEvent } from 'react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { Link, useNavigate } from 'react-router-dom'
 import { productService } from '../api/productService'
 import AppFooter from '../components/layout/AppFooter'
 import AppNavbar from '../components/layout/AppNavbar'
+import ChevronDownIcon from '../components/icons/ChevronDownIcon'
 import ImagePlaceholderIcon from '../components/icons/ImagePlaceholderIcon'
 import SearchIcon from '../components/icons/SearchIcon'
 import { filterMockProducts } from '../data/mockProducts'
@@ -18,6 +20,9 @@ import { formatPrice } from '../utils/formatPrice'
 import { getLikedProductIds, toggleProductLike } from '../utils/favorites'
 import HeartIcon from '../components/icons/HeartIcon'
 import './StartPage.css'
+
+const quickCategories = galleryCategories.slice(0, 7)
+const moreCategories = galleryCategories.slice(7)
 
 export default function StartPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -110,20 +115,73 @@ export default function StartPage() {
           />
         </div>
 
-        <div className="start-page__filters" role="group" aria-label="Categorías">
-          {galleryCategories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              className={`start-page__filter${
-                activeCategory === category ? ' start-page__filter--active' : ''
-              }`}
-              onClick={() => setActiveCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+        <section className="start-page__filters-panel" aria-labelledby="category-filter-title">
+          <div className="start-page__filters-heading">
+            <h1 id="category-filter-title" className="start-page__filters-title">
+              Categorías
+            </h1>
+          </div>
+
+          <div className="start-page__filters" role="group" aria-label="Categorías frecuentes">
+            <div className="start-page__filters-scroll">
+              {quickCategories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={`start-page__filter${
+                    activeCategory === category ? ' start-page__filter--active' : ''
+                  }`}
+                  onClick={() => setActiveCategory(category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+
+            <DropdownMenu.Root modal={false}>
+              <DropdownMenu.Trigger asChild>
+                <button
+                  type="button"
+                  className={`start-page__dropdown-trigger${
+                    moreCategories.includes(activeCategory)
+                      ? ' start-page__dropdown-trigger--active'
+                      : ''
+                  }`}
+                >
+                  <span>
+                    {moreCategories.includes(activeCategory)
+                      ? activeCategory
+                      : 'Más categorías'}
+                  </span>
+                  <ChevronDownIcon className="start-page__dropdown-chevron" />
+                </button>
+              </DropdownMenu.Trigger>
+
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className="start-page__dropdown-menu"
+                  align="end"
+                  sideOffset={8}
+                  collisionPadding={16}
+                >
+                  {moreCategories.map((category) => (
+                    <DropdownMenu.Item
+                      key={category}
+                      className={`start-page__dropdown-option${
+                        activeCategory === category
+                          ? ' start-page__dropdown-option--active'
+                          : ''
+                      }`}
+                      onSelect={() => setActiveCategory(category)}
+                    >
+                      {category}
+                    </DropdownMenu.Item>
+                  ))}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          </div>
+        </section>
 
         {isLoading ? (
           <p className="start-page__status">Cargando productos...</p>

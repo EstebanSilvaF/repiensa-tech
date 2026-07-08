@@ -3,8 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { paths } from '../../routes/paths'
 import ChatIcon from '../icons/ChatIcon'
-import CubeLogoIcon from '../icons/CubeLogoIcon'
 import UserIcon from '../icons/UserIcon'
+import logoMark from '../../assets/logo-mark.svg'
 import './AppNavbar.css'
 
 const navLinks = [
@@ -63,7 +63,7 @@ export default function AppNavbar() {
         className="app-navbar__logo"
         aria-label="Re-Pensa Tech inicio"
       >
-        <CubeLogoIcon />
+        <img src={logoMark} alt="Re-Pensa Tech" className="app-navbar__logo-img" />
       </Link>
 
       <nav className="app-navbar__nav" aria-label="Navegación principal">

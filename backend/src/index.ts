@@ -7,11 +7,13 @@ import { env } from './infrastructure/config/env';
 import { isSwaggerEnabled } from './infrastructure/config/swagger';
 import { scheduleJobs } from './application/jobs/scheduleJobs';
 import { initSocketServer } from './infrastructure/ws/socket';
+import { ensureDefaultUniversity } from './infrastructure/seed/default-university';
 
 async function bootstrap() {
   try {
     await connectMongo();
     await prisma.$connect();
+    await ensureDefaultUniversity();
     scheduleJobs();
 
     const httpServer = createServer(app);
