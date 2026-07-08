@@ -2,10 +2,11 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { connectMongo, disconnectMongo } from '../persistence/mongo/connection';
 import { UserModel } from '../persistence/mongo/models/user.model';
+import { DEFAULT_UNIVERSITY_ID } from './default-university';
 
 const prisma = new PrismaClient();
 
-const UNIVERSITY_ID = 'cluniempresarial01';
+const UNIVERSITY_ID = DEFAULT_UNIVERSITY_ID;
 const PRODUCT_1_ID = 'clprodarduino001';
 const PRODUCT_2_ID = 'clprodsensor001';
 

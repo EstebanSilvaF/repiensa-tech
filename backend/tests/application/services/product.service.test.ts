@@ -54,6 +54,16 @@ describe('productService search expansion', () => {
       created_at: new Date(),
       updated_at: new Date(),
     } as any)
+    vi.mocked(userRepository.findById).mockResolvedValue({
+      id: 'buyer-1',
+      university_id: 'uni-1',
+      full_name: 'Ana',
+      email: 'ana@example.com',
+      password_hash: 'hash',
+      role: 'student',
+      created_at: new Date(),
+      updated_at: new Date(),
+    } as any)
 
     await productService.markAsAcquired('product-1', 'buyer-1')
 

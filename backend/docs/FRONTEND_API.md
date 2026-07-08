@@ -1012,10 +1012,3 @@ Sin estas variables, `POST /api/upload/product-image` responde error. El resto d
 - [ ] Flujo publicar: `uploadProductImage` → `createProduct` con `image_url` + `image_public_id`
 - [ ] Formulario multipart: campo `image` (no base64 en JSON)
 
-Usuario	Contraseña
-maria.rodriguez@uniempresarial.edu.co
-Estudiante1!
-carlos.mendoza@uniempresarial.edu.co
-Estudiante1!
-admin@uniempresarial.edu.co
-Admin1!

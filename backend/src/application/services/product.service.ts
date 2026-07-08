@@ -1,5 +1,6 @@
 import { productRepository } from '../../infrastructure/persistence/repositories/product.repository';
 import { transactionRepository } from '../../infrastructure/persistence/repositories/transaction.repository';
+import { universityRepository } from '../../infrastructure/persistence/repositories/university.repository';
 import { userRepository } from '../../infrastructure/persistence/repositories/user.repository';
 import { expandSearchTerms } from '../../infrastructure/config/ai';
 import { uploadService } from './upload.service';
@@ -37,6 +38,11 @@ export const productService = {
 
   async create(sellerId: string, universityId: string, data: CreateProductDTO) {
     validateCreateProduct(data, uploadService.isCloudinaryUrl.bind(uploadService));
+
+    const university = await universityRepository.findById(universityId);
+    if (!university) {
+      throw new Error('La universidad no está registrada en el sistema');
+    }
 
     return productRepository.create(sellerId, universityId, data);
   },
