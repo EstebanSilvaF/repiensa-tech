@@ -34,6 +34,9 @@ app.use('/api/chats', chatRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/ping', (req, res) => {
+  res.json({ status: 'Este es un ping' });
+});
 
 app.use(errorHandler);
 
