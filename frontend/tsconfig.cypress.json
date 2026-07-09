@@ -1,19 +1,7 @@
 {
+  "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    "target": "es2023",
-    "lib": ["ES2023", "DOM"],
-    "module": "esnext",
-    "types": ["cypress", "node"],
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "types": ["cypress", "node", "vite/client"]
   },
   "include": [
     "cypress/**/*.ts",
