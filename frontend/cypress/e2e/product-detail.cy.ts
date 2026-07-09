@@ -37,7 +37,9 @@ describe('Product detail — detalle del producto', () => {
   it('vuelve a la galería desde el detalle', () => {
     cy.fixture('users').then(({ buyer, products }) => {
       cy.login(buyer.email, buyer.password);
-      cy.visit(`/producto/${products.arduinoId}`);
+      cy.visit('/inicio');
+      cy.contains('a', 'Arduino Uno R3', { timeout: 10000 }).click();
+      cy.url().should('match', /\/producto\/.+/);
 
       cy.contains('button', '← Volver').click();
       cy.url().should('include', '/inicio');

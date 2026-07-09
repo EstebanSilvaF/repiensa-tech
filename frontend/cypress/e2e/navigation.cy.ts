@@ -22,7 +22,8 @@ describe('Navigation — rutas protegidas', () => {
   it('navega al perfil desde el icono de usuario', () => {
     cy.visit('/inicio');
     cy.fixture('users').then(({ student }) => {
-      cy.get(`a[aria-label="Perfil de ${student.fullName}"]`).click();
+      cy.get(`button[aria-label="Perfil de ${student.fullName}"]`).click();
+      cy.contains('[role="menuitem"]', 'Mi perfil').click();
       cy.url().should('include', '/profile');
       cy.contains('h1', student.fullName).should('be.visible');
     });

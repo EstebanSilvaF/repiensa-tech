@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "test:e2e": "start-server-and-test dev http://localhost:5173 cypress:run"
+    "test:e2e": "npx --yes wait-on http://localhost:8081 && cypress run"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.20",

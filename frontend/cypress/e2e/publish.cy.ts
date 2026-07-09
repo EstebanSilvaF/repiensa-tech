@@ -8,7 +8,8 @@ describe('Publish — publicar producto', () => {
     cy.contains('h1', 'Publicar producto', { timeout: 10000 }).should('be.visible');
     cy.contains('h2', 'Foto del producto').should('be.visible');
     cy.contains('h2', 'Información básica').should('be.visible');
-    cy.contains('h2', 'Estado del producto').should('be.visible');
+    cy.contains('legend', 'Estado del producto').should('be.visible');
+    cy.contains('p', 'Quiero donarlo gratis').should('be.visible');
     cy.contains('button', 'Publicar').should('be.visible');
   });
 
