@@ -1,10 +1,10 @@
 interface ImagePlaceholderIconProps {
-  className?: string
+  readonly className?: string
 }
 
 export default function ImagePlaceholderIcon({
   className,
-}: ImagePlaceholderIconProps) {
+}: Readonly<ImagePlaceholderIconProps>) {
   return (
     <svg
       className={className}

@@ -100,7 +100,7 @@ export function sortChatsByActivity(chats: Chat[]): Chat[] {
 export function getAvatarColor(name: string): string {
   let hash = 0
   for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+    hash = (name.codePointAt(i) ?? 0) + ((hash << 5) - hash)
   }
   return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
 }
@@ -319,7 +319,7 @@ export function groupMessagesByDate(
   const groups: { dateLabel: string; items: ChatMessageView[] }[] = []
 
   for (const message of messages) {
-    const lastGroup = groups[groups.length - 1]
+    const lastGroup = groups.at(-1)
     if (lastGroup && lastGroup.items[0]?.dateKey === message.dateKey) {
       lastGroup.items.push(message)
     } else {

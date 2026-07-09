@@ -5,7 +5,8 @@ info:
     API REST del marketplace universitario Re-Pensa Tech.
 
     - Prefijo de rutas de negocio: `/api`
-    - Autenticación: JWT Bearer (7 días de vigencia)
+    - Autenticación: JWT Bearer
+    -
     - Errores: `{ "message": "..." }`
 
     Documentación complementaria: `FRONTEND_API.md`

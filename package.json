@@ -26,9 +26,11 @@
     "test:api": "node scripts/run-api-tests.js",
     "test:api:report": "node scripts/run-api-tests.js --reporter cli,json --export postman/results/newman.json",
     "test:api:docker": "docker compose --profile api run --rm newman",
-    "test:load:smoke": "docker compose --profile load run --rm k6 run /scripts/smoke.js",
-    "test:load": "docker compose --profile load run --rm k6 run /scripts/api-load.js",
+    "test:load:smoke": "docker compose --profile load run --rm --no-deps k6 run /scripts/smoke.js",
+    "test:load": "docker compose --profile load run --rm --no-deps k6 run /scripts/api-load.js",
+    "test:load:stress": "docker compose --profile load run --rm --no-deps k6 run /scripts/api-load-stress.js",
     "sonar:up": "docker compose --profile sonar up -d sonarqube",
+    "sonar:reset": "docker compose --profile sonar down && docker volume rm repiensa-tech_sonarqube_data && docker compose --profile sonar up -d sonarqube",
     "sonar:coverage": "npm run test:coverage --prefix backend && node backend/scripts/fix-lcov-for-sonar.js",
     "sonar:scan": "docker compose --profile sonar run --rm sonar-scanner",
     "sonar": "npm run sonar:coverage && npm run sonar:scan"

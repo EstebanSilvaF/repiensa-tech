@@ -9,6 +9,11 @@
     "password": "Estudiante1!",
     "fullName": "Carlos Mendoza"
   },
+  "library": {
+    "email": "biblioteca@uniempresarial.edu.co",
+    "password": "biblioteca123",
+    "fullName": "Biblioteca Universitaria"
+  },
   "products": {
     "arduinoId": "clprodarduino001",
     "sensorId": "clprodsensor001"

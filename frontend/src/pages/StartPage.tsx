@@ -90,6 +90,76 @@ export default function StartPage() {
     }
   }, [isAuthenticated, activeCategory, search])
 
+  function renderProductsContent() {
+    if (isLoading) {
+      return <p className="start-page__status">Cargando productos...</p>
+    }
+
+    if (error) {
+      return (
+        <p className="start-page__status start-page__status--error" role="alert">
+          {error}
+        </p>
+      )
+    }
+
+    if (products.length === 0) {
+      return (
+        <p className="start-page__status">
+          No hay productos disponibles con estos filtros.
+        </p>
+      )
+    }
+
+    return (
+      <div className="start-page__grid">
+        {products.map((product) => {
+          const liked = likedProductIds.includes(product.id)
+
+          return (
+            <div key={product.id} className="start-page__card">
+              <button
+                type="button"
+                className={`start-page__like-button${liked ? ' start-page__like-button--active' : ''}`}
+                aria-label={liked ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                onClick={(event) => handleToggleFavorite(event, product.id)}
+              >
+                <HeartIcon filled={liked} />
+              </button>
+
+              <Link
+                to={paths.productDetail(product.id)}
+                className="start-page__card-link"
+              >
+                <div className="start-page__card-image">
+                  {product.image_url ? (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="start-page__card-img"
+                    />
+                  ) : (
+                    <ImagePlaceholderIcon />
+                  )}
+                </div>
+                <div className="start-page__card-body">
+                  <h2 className="start-page__card-title">{product.name}</h2>
+                  {product.is_donation ? (
+                    <span className="start-page__card-donation">Donación</span>
+                  ) : (
+                    <p className="start-page__card-price">
+                      {formatPrice(product.price, false)}
+                    </p>
+                  )}
+                </div>
+              </Link>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   if (isAuthLoading || !isAuthenticated) {
     return (
       <div className="start-page">
@@ -122,7 +192,8 @@ export default function StartPage() {
             </h1>
           </div>
 
-          <div className="start-page__filters" role="group" aria-label="Categorías frecuentes">
+          <fieldset className="start-page__filters">
+            <legend className="start-page__filters-legend">Categorías frecuentes</legend>
             <div className="start-page__filters-scroll">
               {quickCategories.map((category) => (
                 <button
@@ -180,66 +251,10 @@ export default function StartPage() {
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>
             </DropdownMenu.Root>
-          </div>
+          </fieldset>
         </section>
 
-        {isLoading ? (
-          <p className="start-page__status">Cargando productos...</p>
-        ) : error ? (
-          <p className="start-page__status start-page__status--error" role="alert">
-            {error}
-          </p>
-        ) : products.length === 0 ? (
-          <p className="start-page__status">
-            No hay productos disponibles con estos filtros.
-          </p>
-        ) : (
-          <div className="start-page__grid">
-            {products.map((product) => {
-              const liked = likedProductIds.includes(product.id)
-
-              return (
-                <div key={product.id} className="start-page__card">
-                  <button
-                    type="button"
-                    className={`start-page__like-button${liked ? ' start-page__like-button--active' : ''}`}
-                    aria-label={liked ? 'Quitar de favoritos' : 'Agregar a favoritos'}
-                    onClick={(event) => handleToggleFavorite(event, product.id)}
-                  >
-                    <HeartIcon filled={liked} />
-                  </button>
-
-                  <Link
-                    to={paths.productDetail(product.id)}
-                    className="start-page__card-link"
-                  >
-                    <div className="start-page__card-image">
-                      {product.image_url ? (
-                        <img
-                          src={product.image_url}
-                          alt={product.name}
-                          className="start-page__card-img"
-                        />
-                      ) : (
-                        <ImagePlaceholderIcon />
-                      )}
-                    </div>
-                    <div className="start-page__card-body">
-                      <h2 className="start-page__card-title">{product.name}</h2>
-                      {product.is_donation ? (
-                        <span className="start-page__card-donation">Donación</span>
-                      ) : (
-                        <p className="start-page__card-price">
-                          {formatPrice(product.price, false)}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                </div>
-              )
-            })}
-          </div>
-        )}
+        {renderProductsContent()}
       </main>
 
       <AppFooter variant="light" />

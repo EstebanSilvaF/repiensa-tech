@@ -15,6 +15,8 @@ export default defineConfig({
       studentPassword: 'Estudiante1!',
       buyerEmail: 'carlos.mendoza@uniempresarial.edu.co',
       buyerPassword: 'Estudiante1!',
+      libraryEmail: 'biblioteca@uniempresarial.edu.co',
+      libraryPassword: 'biblioteca123',
     },
   },
 });

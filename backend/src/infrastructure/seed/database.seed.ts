@@ -3,16 +3,14 @@ import { PrismaClient } from '@prisma/client';
 import { connectMongo, disconnectMongo } from '../persistence/mongo/connection';
 import { UserModel } from '../persistence/mongo/models/user.model';
 import { DEFAULT_UNIVERSITY_ID } from './default-university';
+import { hashSeedPassword, SEED_ENV_KEYS } from './seed-credentials';
+import { SEED_IMAGE_ARDUINO, SEED_IMAGE_SENSOR } from './seed-images';
 
 const prisma = new PrismaClient();
 
 const UNIVERSITY_ID = DEFAULT_UNIVERSITY_ID;
 const PRODUCT_1_ID = 'clprodarduino001';
 const PRODUCT_2_ID = 'clprodsensor001';
-
-const ADMIN_PASSWORD_HASH = '$2b$10$E1zYbUfaQQr49FfOMSBIe.ossGjfJrhDMvC25yIUOEyHIePqy8zYm';
-const STUDENT_PASSWORD_HASH = '$2b$10$YAIo7YHyOLFwcmUbHsZdaul.EVuVv6uFCPbcU1ikNmChQS34ndDuW';
-const LIBRARY_PASSWORD_HASH = '$2b$10$Esw6yh1E1HysOHrOxdbgOukezkFWAJ8wAgqyFoIxw68F7Gke8EaRi';
 
 async function clearPostgresSeedData(): Promise<void> {
   await prisma.transaction.deleteMany({ where: { product: { universityId: UNIVERSITY_ID } } });
@@ -25,6 +23,12 @@ async function clearPostgresSeedData(): Promise<void> {
 
 async function main(): Promise<void> {
   await connectMongo();
+
+  const [adminPasswordHash, studentPasswordHash, libraryPasswordHash] = await Promise.all([
+    hashSeedPassword(SEED_ENV_KEYS.admin),
+    hashSeedPassword(SEED_ENV_KEYS.student),
+    hashSeedPassword(SEED_ENV_KEYS.library),
+  ]);
 
   await UserModel.deleteMany({});
   await clearPostgresSeedData();
@@ -45,28 +49,28 @@ async function main(): Promise<void> {
       university_id: UNIVERSITY_ID,
       full_name: 'Admin Repensa',
       email: 'admin@uniempresarial.edu.co',
-      password_hash: ADMIN_PASSWORD_HASH,
+      password_hash: adminPasswordHash,
       role: 'admin',
     },
     {
       university_id: UNIVERSITY_ID,
       full_name: 'María Rodríguez',
       email: 'maria.rodriguez@uniempresarial.edu.co',
-      password_hash: STUDENT_PASSWORD_HASH,
+      password_hash: studentPasswordHash,
       role: 'student',
     },
     {
       university_id: UNIVERSITY_ID,
       full_name: 'Carlos Mendoza',
       email: 'carlos.mendoza@uniempresarial.edu.co',
-      password_hash: STUDENT_PASSWORD_HASH,
+      password_hash: studentPasswordHash,
       role: 'student',
     },
     {
       university_id: UNIVERSITY_ID,
       full_name: 'Biblioteca Universitaria',
       email: 'biblioteca@uniempresarial.edu.co',
-      password_hash: LIBRARY_PASSWORD_HASH,
+      password_hash: libraryPasswordHash,
       role: 'library',
     },
   ]);
@@ -86,8 +90,8 @@ async function main(): Promise<void> {
         category: 'microcontrollers',
         condition: 'good',
         status: 'available',
-        imageUrl: 'https://res.cloudinary.com/demo/image/upload/sample.jpg',
-        imagePublicId: null,
+        imageUrl: SEED_IMAGE_ARDUINO.imageUrl,
+        imagePublicId: SEED_IMAGE_ARDUINO.imagePublicId,
       },
       {
         id: PRODUCT_2_ID,
@@ -100,8 +104,8 @@ async function main(): Promise<void> {
         category: 'sensors',
         condition: 'good',
         status: 'available',
-        imageUrl: 'https://res.cloudinary.com/demo/image/upload/d_desert.jpg',
-        imagePublicId: null,
+        imageUrl: SEED_IMAGE_SENSOR.imageUrl,
+        imagePublicId: SEED_IMAGE_SENSOR.imagePublicId,
       },
     ],
   });

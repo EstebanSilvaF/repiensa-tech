@@ -4,7 +4,7 @@ export interface University {
   id: string;
   name: string;
   email_domain: string;
-  subscription_status: SubscriptionStatus | string;
+  subscription_status: SubscriptionStatus;
   subscription_start: Date;
   subscription_end: Date;
   created_at: Date;

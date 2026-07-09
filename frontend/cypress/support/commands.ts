@@ -2,6 +2,7 @@ declare global {
   namespace Cypress {
     interface Chainable {
       login(email?: string, password?: string): Cypress.Chainable<void>;
+      loginLibrary(): Cypress.Chainable<void>;
     }
   }
 }
@@ -17,6 +18,10 @@ Cypress.Commands.add('login', (email?: string, password?: string) => {
     cy.contains('button', 'Iniciar sesión').click();
     cy.url().should('include', '/inicio');
   });
+});
+
+Cypress.Commands.add('loginLibrary', () => {
+  cy.login(Cypress.env('libraryEmail'), Cypress.env('libraryPassword'));
 });
 
 export {};

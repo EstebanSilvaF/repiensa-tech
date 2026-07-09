@@ -1,8 +1,8 @@
 interface SearchIconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function SearchIcon({ className }: SearchIconProps) {
+export default function SearchIcon({ className }: Readonly<SearchIconProps>) {
   return (
     <svg
       className={className}

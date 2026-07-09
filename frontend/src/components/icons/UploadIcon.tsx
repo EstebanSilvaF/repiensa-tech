@@ -1,8 +1,8 @@
 interface UploadIconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function UploadIcon({ className }: UploadIconProps) {
+export default function UploadIcon({ className }: Readonly<UploadIconProps>) {
   return (
     <svg
       className={className}

@@ -189,7 +189,9 @@
 }
 
 .product-detail-card__disclaimer {
+  display: block;
   margin: 0;
+  border: none;
   font-family: var(--font-body);
   font-size: 0.75rem;
   line-height: 1.5;

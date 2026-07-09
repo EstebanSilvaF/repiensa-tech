@@ -14,7 +14,7 @@ export function authMiddleware(
 ): void {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith('Bearer ')) {
     res.status(401).json({ message: 'Token no proporcionado' });
     return;
   }

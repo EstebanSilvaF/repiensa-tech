@@ -1,4 +1,4 @@
-import { Server as HttpServer } from 'http';
+import { Server as HttpServer } from 'node:http';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { env } from '../config/env';

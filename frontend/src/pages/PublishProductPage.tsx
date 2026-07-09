@@ -1,17 +1,19 @@
 import {
   type ChangeEvent,
   type DragEvent,
-  type FormEvent,
+  type SubmitEvent,
   useEffect,
   useRef,
   useState,
 } from 'react'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   productService,
   validateProductImage,
 } from '../api/productService'
 import AppNavbar from '../components/layout/AppNavbar'
+import ChevronDownIcon from '../components/icons/ChevronDownIcon'
 import ImagePlaceholderIcon from '../components/icons/ImagePlaceholderIcon'
 import UploadIcon from '../components/icons/UploadIcon'
 import { useAuth } from '../hooks/useAuth'
@@ -26,6 +28,38 @@ import {
 import { formatPrice } from '../utils/formatPrice'
 import { conditionChips, getConditionLabel } from '../utils/productLabels'
 import './PublishProductPage.css'
+
+type FieldErrors = {
+  image?: string
+  name?: string
+  price?: string
+}
+
+function getFieldErrors(
+  imageFile: File | null,
+  name: string,
+  price: string,
+  isDonation: boolean,
+): FieldErrors {
+  const errors: FieldErrors = {}
+
+  if (!imageFile) {
+    errors.image = 'Debes subir una foto del producto.'
+  }
+
+  if (!name.trim()) {
+    errors.name = 'Ingresa el nombre del producto.'
+  }
+
+  if (!isDonation) {
+    const parsedPrice = Number(price)
+    if (!price.trim() || Number.isNaN(parsedPrice) || parsedPrice < 0) {
+      errors.price = 'Ingresa un precio válido.'
+    }
+  }
+
+  return errors
+}
 
 export default function PublishProductPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
@@ -42,6 +76,7 @@ export default function PublishProductPage() {
   const [price, setPrice] = useState('')
   const [isDonation, setIsDonation] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false)
 
@@ -72,11 +107,11 @@ export default function PublishProductPage() {
 
     const validationError = validateProductImage(file)
     if (validationError) {
-      setError(validationError)
+      setFieldErrors((prev) => ({ ...prev, image: validationError }))
       return
     }
 
-    setError(null)
+    setFieldErrors((prev) => ({ ...prev, image: undefined }))
     setImageFile(file)
     setImagePreview(URL.createObjectURL(file))
   }
@@ -87,7 +122,7 @@ export default function PublishProductPage() {
     event.target.value = ''
   }
 
-  function handleDrop(event: DragEvent<HTMLDivElement>) {
+  function handleDrop(event: DragEvent<HTMLLabelElement>) {
     event.preventDefault()
     setIsDragging(false)
     const file = event.dataTransfer.files?.[0] ?? null
@@ -120,20 +155,19 @@ export default function PublishProductPage() {
     }
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
 
-    if (!imageFile) {
-      setError('Debes subir una foto del producto.')
+    const nextFieldErrors = getFieldErrors(imageFile, name, price, isDonation)
+    if (Object.keys(nextFieldErrors).length > 0 || !imageFile) {
+      setFieldErrors(nextFieldErrors)
       return
     }
 
+    setFieldErrors({})
+
     const parsedPrice = isDonation ? 0 : Number(price)
-    if (!isDonation && (!price || Number.isNaN(parsedPrice) || parsedPrice < 0)) {
-      setError('Ingresa un precio válido.')
-      return
-    }
 
     setIsSubmitting(true)
 
@@ -189,11 +223,21 @@ export default function PublishProductPage() {
         <h1 className="publish-page__title">Publicar producto</h1>
 
         <div className="publish-page__layout">
-          <form className="publish-form" onSubmit={handleSubmit}>
+          <form className="publish-form" onSubmit={handleSubmit} noValidate>
             <section className="publish-form__section">
               <h2 className="publish-form__section-title">Foto del producto</h2>
 
-              <div
+              <input
+                id="product-image"
+                ref={fileInputRef}
+                type="file"
+                className="publish-form__file-input"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleFileChange}
+              />
+
+              <label
+                htmlFor="product-image"
                 className={`publish-form__dropzone${
                   isDragging ? ' publish-form__dropzone--dragging' : ''
                 }${imagePreview ? ' publish-form__dropzone--has-image' : ''}`}
@@ -203,25 +247,7 @@ export default function PublishProductPage() {
                 }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    fileInputRef.current?.click()
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-                aria-label="Subir foto del producto"
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="publish-form__file-input"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={handleFileChange}
-                />
-
                 {imagePreview ? (
                   <img
                     src={imagePreview}
@@ -239,7 +265,13 @@ export default function PublishProductPage() {
                     </p>
                   </div>
                 )}
-              </div>
+              </label>
+
+              {fieldErrors.image && (
+                <p className="publish-form__field-error" role="alert">
+                  {fieldErrors.image}
+                </p>
+              )}
 
               <p className="publish-form__helper">
                 Una buena foto aumenta las posibilidades de venta
@@ -265,13 +297,30 @@ export default function PublishProductPage() {
                 </label>
                 <input
                   id="product-name"
-                  className="publish-form__input"
+                  className={`publish-form__input${
+                    fieldErrors.name ? ' publish-form__input--error' : ''
+                  }`}
                   type="text"
                   placeholder="Ej. Arduino Uno R3"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    if (fieldErrors.name) {
+                      setFieldErrors((prev) => ({ ...prev, name: undefined }))
+                    }
+                  }}
+                  aria-invalid={Boolean(fieldErrors.name)}
+                  aria-describedby={fieldErrors.name ? 'product-name-error' : undefined}
                 />
+                {fieldErrors.name && (
+                  <p
+                    id="product-name-error"
+                    className="publish-form__field-error"
+                    role="alert"
+                  >
+                    {fieldErrors.name}
+                  </p>
+                )}
               </div>
 
               <div className="publish-form__field">
@@ -301,22 +350,45 @@ export default function PublishProductPage() {
 
             <div className="publish-form__row">
               <div className="publish-form__field">
-                <label htmlFor="product-category" className="publish-form__label">
+                <span id="product-category-label" className="publish-form__label">
                   Categoría
-                </label>
-                <select
-                  id="product-category"
-                  className="publish-form__select"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as PublishCategory)}
-                  required
-                >
-                  {publishCategories.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
+                </span>
+                <DropdownMenu.Root modal={false}>
+                  <DropdownMenu.Trigger asChild>
+                    <button
+                      type="button"
+                      id="product-category"
+                      className="publish-form__category-trigger"
+                      aria-labelledby="product-category-label product-category"
+                    >
+                      <span id="product-category">{category}</span>
+                      <ChevronDownIcon className="publish-form__category-chevron" />
+                    </button>
+                  </DropdownMenu.Trigger>
+
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content
+                      className="publish-form__category-menu"
+                      align="start"
+                      sideOffset={8}
+                      collisionPadding={16}
+                    >
+                      {publishCategories.map((item) => (
+                        <DropdownMenu.Item
+                          key={item}
+                          className={`publish-form__category-option${
+                            category === item
+                              ? ' publish-form__category-option--active'
+                              : ''
+                          }`}
+                          onSelect={() => setCategory(item)}
+                        >
+                          {item}
+                        </DropdownMenu.Item>
+                      ))}
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
               </div>
 
               <div className="publish-form__field">
@@ -325,47 +397,62 @@ export default function PublishProductPage() {
                 </label>
                 <input
                   id="product-price"
-                  className="publish-form__input"
+                  className={`publish-form__input${
+                    fieldErrors.price ? ' publish-form__input--error' : ''
+                  }`}
                   type="number"
                   min="0"
-                  step="1000"
+                  inputMode="numeric"
                   placeholder={isDonation ? '0' : 'Ej. 75000'}
                   value={isDonation ? '0' : price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  onChange={(e) => {
+                    setPrice(e.target.value)
+                    if (fieldErrors.price) {
+                      setFieldErrors((prev) => ({ ...prev, price: undefined }))
+                    }
+                  }}
                   disabled={isDonation}
-                  required={!isDonation}
+                  aria-invalid={Boolean(fieldErrors.price)}
+                  aria-describedby={fieldErrors.price ? 'product-price-error' : undefined}
                 />
+                {fieldErrors.price && (
+                  <p
+                    id="product-price-error"
+                    className="publish-form__field-error"
+                    role="alert"
+                  >
+                    {fieldErrors.price}
+                  </p>
+                )}
               </div>
             </div>
 
             <section className="publish-form__section">
-              <h2 className="publish-form__section-title">Estado del producto</h2>
+              <fieldset className="publish-form__chips-fieldset">
+                <legend className="publish-form__section-title">Estado del producto</legend>
 
-              <div
-                className="publish-form__chips"
-                role="group"
-                aria-label="Estado del producto"
-              >
-                {conditionChips.map((item) => (
-                  <button
-                    key={item.value}
-                    type="button"
-                    className={`publish-form__chip${
-                      condition === item.value ? ' publish-form__chip--active' : ''
-                    }`}
-                    onClick={() => setCondition(item.value)}
-                    aria-pressed={condition === item.value}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+                <div className="publish-form__chips">
+                  {conditionChips.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      className={`publish-form__chip${
+                        condition === item.value ? ' publish-form__chip--active' : ''
+                      }`}
+                      onClick={() => setCondition(item.value)}
+                      aria-pressed={condition === item.value}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
             </section>
 
             <section className="publish-form__section">
               <div className="publish-form__donation-card">
                 <div className="publish-form__donation-copy">
-                  <p className="publish-form__donation-title">
+                  <p id="donation-toggle-label" className="publish-form__donation-title">
                     Quiero donarlo gratis
                   </p>
                   <p className="publish-form__donation-hint">
@@ -373,11 +460,19 @@ export default function PublishProductPage() {
                   </p>
                 </div>
 
-                <label className="publish-form__toggle">
+                <label
+                  className="publish-form__toggle"
+                  aria-labelledby="donation-toggle-label"
+                >
                   <input
                     type="checkbox"
                     checked={isDonation}
-                    onChange={(e) => setIsDonation(e.target.checked)}
+                    onChange={(e) => {
+                      setIsDonation(e.target.checked)
+                      if (e.target.checked) {
+                        setFieldErrors((prev) => ({ ...prev, price: undefined }))
+                      }
+                    }}
                   />
                   <span className="publish-form__toggle-track" aria-hidden="true">
                     <span className="publish-form__toggle-thumb" />

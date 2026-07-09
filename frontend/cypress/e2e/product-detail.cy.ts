@@ -39,7 +39,7 @@ describe('Product detail — detalle del producto', () => {
       cy.login(buyer.email, buyer.password);
       cy.visit(`/producto/${products.arduinoId}`);
 
-      cy.contains('a', '← Volver').click();
+      cy.contains('button', '← Volver').click();
       cy.url().should('include', '/inicio');
     });
   });
