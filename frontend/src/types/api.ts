@@ -256,3 +256,37 @@ export interface OpenChatRequest {
 export interface ConfirmDeliveryResponse {
   message: string
 }
+
+export type NotificationType =
+  | 'reservation_confirmed'
+  | 'reservation_expiring'
+  | 'reservation_expired'
+  | 'product_approved'
+  | 'new_message'
+  | 'new_interested'
+  | 'sale_completed'
+  | 'purchase_completed'
+  | 'admin_published'
+
+export type NotificationRef = 'product' | 'chat' | 'reservation' | 'transaction'
+
+export interface Notification {
+  id: string
+  user_id: string
+  type: NotificationType
+  title: string
+  description: string | null
+  is_read: boolean
+  reference_id: string | null
+  reference_type: NotificationRef | null
+  created_at: string
+}
+
+export interface NotificationsResponse {
+  unread: number
+  notifications: Notification[]
+}
+
+export interface MessageResponse {
+  message: string
+}

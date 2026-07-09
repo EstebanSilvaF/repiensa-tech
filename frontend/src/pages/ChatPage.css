@@ -506,7 +506,7 @@
   border-radius: 1rem;
   font-size: 0.84rem;
   line-height: 1.5;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .chat-panel__bubble--incoming {
@@ -604,8 +604,8 @@
 }
 
 .chat-panel__appointment-reject {
-  color: rgba(0, 0, 0, 0.55);
-  background: rgba(0, 0, 0, 0.06);
+  color: #374151;
+  background: #f3f4f6;
 }
 
 .chat-panel__appointment-accept:disabled,
@@ -733,19 +733,22 @@
   margin: 0 1.15rem 0.5rem;
   padding: 0.65rem 0.85rem;
   border-radius: 0.5rem;
-  color: #b91c1c;
-  background: rgba(185, 28, 28, 0.08);
+  color: #991b1b;
+  background: #fef2f2;
   text-align: left;
 }
 
 .chat-panel__closed-notice {
+  display: block;
   margin: 0;
   padding: 0.55rem 1.35rem;
+  border: none;
+  font-family: inherit;
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--color-primary-dark);
-  background: rgba(26, 156, 110, 0.08);
-  border-bottom: 1px solid rgba(26, 156, 110, 0.12);
+  color: #083d2b;
+  background: #e2f3ec;
+  border-bottom: 1px solid #c5e6d8;
 }
 
 .chat-panel__composer--disabled .chat-panel__input-wrap {
@@ -767,13 +770,13 @@
 }
 
 .chat-panel__appointment-form {
-  padding: 0.75rem 1.15rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-  background: #fafafa;
+  padding: 0.85rem 1.15rem;
+  border-top: 1px solid rgba(26, 156, 110, 0.12);
+  background: linear-gradient(180deg, rgba(26, 156, 110, 0.04) 0%, var(--color-white) 100%);
 }
 
 .chat-panel__appointment-title {
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.65rem;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-black);
@@ -782,22 +785,60 @@
 .chat-panel__appointment-fields {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 0.65rem;
+  margin-bottom: 0.65rem;
+}
+
+.chat-panel__appointment-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.chat-panel__appointment-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.45);
 }
 
 .chat-panel__appointment-input {
-  padding: 0.55rem 0.7rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.5rem;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.65rem;
   font-family: var(--font-body);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
+  color: var(--color-black);
+  background: var(--color-white);
+  box-sizing: border-box;
   outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.chat-panel__appointment-input::placeholder {
+  color: rgba(0, 0, 0, 0.35);
 }
 
 .chat-panel__appointment-input:focus {
-  border-color: rgba(26, 156, 110, 0.4);
-  box-shadow: 0 0 0 2px rgba(26, 156, 110, 0.1);
+  border-color: rgba(26, 156, 110, 0.45);
+  box-shadow: 0 0 0 3px rgba(26, 156, 110, 0.12);
+}
+
+.chat-panel__appointment-input[type='date'],
+.chat-panel__appointment-input[type='time'] {
+  color-scheme: light;
+  cursor: pointer;
+}
+
+.chat-panel__appointment-input[type='date']::-webkit-calendar-picker-indicator,
+.chat-panel__appointment-input[type='time']::-webkit-calendar-picker-indicator {
+  opacity: 0.55;
+  cursor: pointer;
 }
 
 .chat-panel__appointment-actions {

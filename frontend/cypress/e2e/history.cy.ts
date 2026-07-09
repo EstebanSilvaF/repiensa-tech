@@ -14,7 +14,7 @@ describe('History — historial', () => {
   });
 
   it('muestra filtros de transacciones', () => {
-    cy.get('[aria-label="Filtrar transacciones"]').within(() => {
+    cy.get('fieldset.history-page__filters').within(() => {
       cy.contains('button', 'Todo').should('be.visible');
       cy.contains('button', 'Compras').should('be.visible');
       cy.contains('button', 'Ventas').should('be.visible');
@@ -23,8 +23,8 @@ describe('History — historial', () => {
   });
 
   it('permite cambiar filtro sin errores', () => {
-    cy.get('[aria-label="Filtrar transacciones"]').contains('button', 'Compras').click();
-    cy.get('[aria-label="Filtrar transacciones"]')
+    cy.get('fieldset.history-page__filters').contains('button', 'Compras').click();
+    cy.get('fieldset.history-page__filters')
       .contains('button', 'Compras')
       .should('have.class', 'history-page__filter--active');
   });

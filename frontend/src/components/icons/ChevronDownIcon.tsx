@@ -1,8 +1,8 @@
 interface ChevronDownIconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function ChevronDownIcon({ className }: ChevronDownIconProps) {
+export default function ChevronDownIcon({ className }: Readonly<ChevronDownIconProps>) {
   return (
     <svg
       className={className}

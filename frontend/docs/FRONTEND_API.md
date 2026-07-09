@@ -966,7 +966,7 @@ Al arrancar el servidor (`npm run dev`), `initDatabase()`:
 | Estudiante | `maria.rodriguez@uniempresarial.edu.co` / `Estudiante1!` |
 | Estudiante | `carlos.mendoza@uniempresarial.edu.co` / `Estudiante1!` |
 | Admin | `admin@uniempresarial.edu.co` / `Admin1!` |
-| Productos demo | Arduino Uno R3, Sensor HC-SR04 (imágenes de cuenta demo Cloudinary) |
+| Productos demo | Arduino Uno R3, Sensor HC-SR04 (imágenes en `repensa/products` de tu cuenta Cloudinary; ver `npm run cloudinary:list` en backend) |
 
 Para recargar el seed en desarrollo: vaciar tablas o recrear la base `repensa`.
 

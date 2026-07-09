@@ -7,6 +7,8 @@ import { transactionService } from '../api/transactionService'
 import { useAuth } from '../hooks/useAuth'
 import { paths } from '../routes/paths'
 import type { Product, Transaction, User } from '../types/api'
+import { mapApiTransaction } from '../utils/mapHistoryTransactions'
+import './HistoryPage.css'
 
 interface LibraryProductItem extends Product {
   kind: 'product'
@@ -20,11 +22,116 @@ interface LibraryTransactionItem extends Transaction {
 
 type LibraryItem = LibraryProductItem | LibraryTransactionItem
 
+function getLibraryItemSearchText(item: LibraryItem): string {
+  if (item.kind === 'transaction') {
+    const parties = `${item.seller_name ?? ''} ${item.buyer_name ?? ''}`.trim()
+    return `${item.product_name} ${parties}`
+  }
+
+  return `${item.name} ${item.seller_name ?? ''}`
+}
+
+function getLibraryItemMeta(item: LibraryItem): string {
+  if (item.kind === 'transaction') {
+    return `Entregado por ${item.seller_name ?? 'Vendedor'} · Adquirido por ${item.buyer_name ?? 'Comprador'}`
+  }
+
+  return `Subido por ${item.seller_name ?? 'Biblioteca'} · Universidad`
+}
+
+type LibraryItemsSectionProps = Readonly<{
+  isLoading: boolean
+  error: string | null
+  items: LibraryItem[]
+  users: User[]
+  selectedBuyerId: string
+  onBuyerChange: (buyerId: string) => void
+  onAcquire: (productId: string) => void
+  onDelete: (productId: string) => void
+}>
+
+function LibraryItemsSection({
+  isLoading,
+  error,
+  items,
+  users,
+  selectedBuyerId,
+  onBuyerChange,
+  onAcquire,
+  onDelete,
+}: LibraryItemsSectionProps) {
+  if (isLoading) {
+    return <p className="history-page__status">Cargando productos...</p>
+  }
+
+  if (error) {
+    return (
+      <p className="history-page__status" role="alert">
+        {error}
+      </p>
+    )
+  }
+
+  if (items.length === 0) {
+    return <p className="history-page__status">No hay elementos para mostrar.</p>
+  }
+
+  return (
+    <section className="history-page__list">
+      {items.map((item) => (
+        <article key={item.id} className="history-item">
+          <div className="history-item__thumb">
+            {item.image_url ? <img src={item.image_url} alt="" /> : <span>📦</span>}
+          </div>
+          <div className="history-item__body">
+            <p className="history-item__name">
+              {item.kind === 'transaction' ? item.product_name : item.name}
+            </p>
+            <p className="history-item__meta">{getLibraryItemMeta(item)}</p>
+          </div>
+          <div className="history-item__aside">
+            {item.kind !== 'transaction' && (
+              <>
+                <select
+                  className="history-page__filter"
+                  value={selectedBuyerId}
+                  onChange={(event) => onBuyerChange(event.target.value)}
+                  aria-label="Seleccionar adquiriente"
+                >
+                  {users.map((candidate) => (
+                    <option key={candidate.id} value={candidate.id}>
+                      {candidate.full_name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="history-page__filter"
+                  onClick={() => onAcquire(item.id)}
+                >
+                  Adquirido
+                </button>
+                <button
+                  type="button"
+                  className="history-page__filter"
+                  onClick={() => onDelete(item.id)}
+                >
+                  Eliminar
+                </button>
+              </>
+            )}
+          </div>
+        </article>
+      ))}
+    </section>
+  )
+}
+
 interface LibraryPageProps {
   view?: 'default' | 'delivered'
 }
 
-export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
+export default function LibraryPage({ view = 'default' }: Readonly<LibraryPageProps>) {
   const navigate = useNavigate()
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
   const [products, setProducts] = useState<Product[]>([])
@@ -42,7 +149,7 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
   }, [isAuthenticated, isAuthLoading, navigate])
 
   async function loadData() {
-    if (!user || user.role !== 'library') return
+    if (user?.role !== 'library') return
 
     setIsLoading(true)
     setError(null)
@@ -60,18 +167,13 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
       setProducts(universityProducts)
       setUsers(universityUsers)
       setSelectedBuyerId((current) => current || universityUsers.find((candidate) => candidate.id === user.id)?.id || universityUsers[0]?.id || '')
-      setTransactions(history.map((tx) => ({
-        ...tx,
-        product_name: tx.product_name ?? 'Producto',
-        counterparty_name: tx.direction === 'sale' ? tx.buyer_name ?? 'Comprador' : tx.seller_name ?? 'Vendedor',
-        amount: tx.direction === 'sale' ? tx.final_price : -tx.final_price,
-        status: tx.final_price === 0 ? 'donated' : 'completed',
-        type: tx.final_price === 0 ? 'donation' : tx.direction === 'sale' ? 'sale' : 'purchase',
-        date: tx.confirmed_at.slice(0, 10),
-        image_url: tx.product_image ?? undefined,
-        buyer_name: tx.buyer_name,
-        seller_name: tx.seller_name,
-      })))
+      setTransactions(
+        history.map((tx) => ({
+          ...mapApiTransaction(tx),
+          buyer_name: tx.buyer_name,
+          seller_name: tx.seller_name,
+        })),
+      )
     } catch {
       setError('No se pudo cargar la vista de biblioteca')
     } finally {
@@ -107,10 +209,9 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
     const query = search.trim().toLowerCase()
     if (!query) return visibleProducts
 
-    return visibleProducts.filter((item) => {
-      const haystack = `${item.kind === 'transaction' ? item.product_name : item.name} ${item.kind === 'transaction' ? `${item.seller_name ?? ''} ${item.buyer_name ?? ''}` : item.seller_name ?? ''}`.toLowerCase()
-      return haystack.includes(query)
-    })
+    return visibleProducts.filter((item) =>
+      getLibraryItemSearchText(item).toLowerCase().includes(query),
+    )
   }, [search, visibleProducts])
 
   async function handleDelete(productId: string) {
@@ -180,57 +281,16 @@ export default function LibraryPage({ view = 'default' }: LibraryPageProps) {
           style={{ marginBottom: '1rem', width: '100%' }}
         />
 
-        {isLoading ? (
-          <p className="history-page__status">Cargando productos...</p>
-        ) : error ? (
-          <p className="history-page__status" role="alert">{error}</p>
-        ) : searchedItems.length === 0 ? (
-          <p className="history-page__status">No hay elementos para mostrar.</p>
-        ) : (
-          <section className="history-page__list">
-            {searchedItems.map((item) => (
-              <article key={item.id} className="history-item">
-                <div className="history-item__thumb">
-                  {item.image_url ? <img src={item.image_url} alt="" /> : <span>📦</span>}
-                </div>
-                <div className="history-item__body">
-                  <p className="history-item__name">
-                    {item.kind === 'transaction' ? item.product_name : item.name}
-                  </p>
-                  <p className="history-item__meta">
-                    {item.kind === 'transaction'
-                      ? `Entregado por ${item.seller_name ?? 'Vendedor'} · Adquirido por ${item.buyer_name ?? 'Comprador'}`
-                      : `Subido por ${item.seller_name ?? 'Biblioteca'} · Universidad`}
-                  </p>
-                </div>
-                <div className="history-item__aside">
-                  {item.kind !== 'transaction' && (
-                    <>
-                      <select
-                        className="history-page__filter"
-                        value={selectedBuyerId}
-                        onChange={(event) => setSelectedBuyerId(event.target.value)}
-                        aria-label="Seleccionar adquiriente"
-                      >
-                        {users.map((candidate) => (
-                          <option key={candidate.id} value={candidate.id}>
-                            {candidate.full_name}
-                          </option>
-                        ))}
-                      </select>
-                      <button type="button" className="history-page__filter" onClick={() => handleAcquire(item.id)}>
-                        Adquirido
-                      </button>
-                      <button type="button" className="history-page__filter" onClick={() => handleDelete(item.id)}>
-                        Eliminar
-                      </button>
-                    </>
-                  )}
-                </div>
-              </article>
-            ))}
-          </section>
-        )}
+        <LibraryItemsSection
+          isLoading={isLoading}
+          error={error}
+          items={searchedItems}
+          users={users}
+          selectedBuyerId={selectedBuyerId}
+          onBuyerChange={setSelectedBuyerId}
+          onAcquire={handleAcquire}
+          onDelete={handleDelete}
+        />
       </main>
     </div>
   )

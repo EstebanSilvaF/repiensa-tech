@@ -1,6 +1,5 @@
-import { ChangePasswordDTO, CreateUserDTO, LoginDTO } from '../types/user.types';
+import { ChangePasswordDTO, CreateUserDTO, LoginDTO, User } from '../types/user.types';
 import { University } from '../types/university.types';
-import { User } from '../types/user.types';
 import { assertValid } from '../../shared/validation/validator';
 import { required, requiredTrimmed } from './shared/field.rules';
 

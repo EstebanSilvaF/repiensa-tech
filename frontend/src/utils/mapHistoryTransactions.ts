@@ -4,25 +4,28 @@ function toDateKey(iso: string): string {
   return iso.slice(0, 10)
 }
 
+function getTransactionType(tx: ApiTransaction): Transaction['type'] {
+  if (tx.final_price === 0) return 'donation'
+  if (tx.direction === 'sale') return 'sale'
+  return 'purchase'
+}
+
+function getTransactionAmount(tx: ApiTransaction, type: Transaction['type']): number {
+  if (type === 'donation') return 0
+  if (tx.direction === 'sale') return tx.final_price
+  return -tx.final_price
+}
+
 export function mapApiTransaction(tx: ApiTransaction): Transaction {
   const isDonation = tx.final_price === 0
-  const type: Transaction['type'] = isDonation
-    ? 'donation'
-    : tx.direction === 'sale'
-      ? 'sale'
-      : 'purchase'
+  const type = getTransactionType(tx)
 
   const counterparty_name =
     tx.direction === 'sale'
       ? (tx.buyer_name ?? 'Comprador')
       : (tx.seller_name ?? 'Vendedor')
 
-  const amount =
-    type === 'donation'
-      ? 0
-      : tx.direction === 'sale'
-        ? tx.final_price
-        : -tx.final_price
+  const amount = getTransactionAmount(tx, type)
 
   return {
     id: tx.id,

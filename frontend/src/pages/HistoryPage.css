@@ -102,6 +102,20 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 2rem;
+  border: none;
+  padding: 0;
+}
+
+.history-page__filters-legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .history-page__filter {
@@ -128,6 +142,12 @@
   background: var(--color-black);
   border-color: var(--color-black);
   color: var(--color-white);
+}
+
+.history-page__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .history-month__title {

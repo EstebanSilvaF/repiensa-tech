@@ -1,8 +1,8 @@
 interface IconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function ChatIcon({ className }: IconProps) {
+export default function ChatIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -13,10 +13,16 @@ export default function ChatIcon({ className }: IconProps) {
       aria-hidden="true"
     >
       <path
-        d="M5 6.5h14v9H9l-4 3.5V6.5Z"
+        d="M6.75 5.5h10.5a2.75 2.75 0 0 1 2.75 2.75v5.5a2.75 2.75 0 0 1-2.75 2.75H11l-3.75 2.75V8.25A2.75 2.75 0 0 1 6.75 5.5Z"
         stroke="currentColor"
         strokeWidth="1.75"
         strokeLinejoin="round"
+      />
+      <path
+        d="M9.25 10.5h5.5M9.25 13h3.5"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
       />
     </svg>
   )

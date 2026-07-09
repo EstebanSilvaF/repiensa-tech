@@ -1,8 +1,8 @@
 interface ArrowRightIconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function ArrowRightIcon({ className }: ArrowRightIconProps) {
+export default function ArrowRightIcon({ className }: Readonly<ArrowRightIconProps>) {
   return (
     <svg
       className={className}

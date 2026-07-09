@@ -1,6 +1,6 @@
 -- RE-PENSA TECH — SEED (legacy SQL, solo referencia)
 -- Los usuarios viven en MongoDB. Usar: npm run db:seed (prisma/seed.ts)
--- Contraseñas: Estudiante1! (estudiantes) | Admin1! (admin)
+-- Contraseñas: Estudiante1! (estudiantes) | Admin1! (admin) | biblioteca123 (biblioteca)
 -- NOTA: La tabla users ya no existe en PostgreSQL. Los usuarios se insertan en MongoDB vía prisma/seed.ts.
 
 INSERT INTO universities (
@@ -38,6 +38,14 @@ INSERT INTO users (id, university_id, full_name, email, password_hash, role) VAL
   'carlos.mendoza@uniempresarial.edu.co',
   '$2b$10$YAIo7YHyOLFwcmUbHsZdaul.EVuVv6uFCPbcU1ikNmChQS34ndDuW',
   'student'
+),
+(
+  'clbiblioteca001',
+  'cluniempresarial01',
+  'Biblioteca Universitaria',
+  'biblioteca@uniempresarial.edu.co',
+  '$2b$10$YAIo7YHyOLFwcmUbHsZdaul.EVuVv6uFCPbcU1ikNmChQS34ndDuW',
+  'library'
 );
 
 INSERT INTO products (
@@ -55,8 +63,8 @@ INSERT INTO products (
   'microcontrollers',
   'good',
   'available',
-  'https://res.cloudinary.com/demo/image/upload/sample.jpg',
-  NULL
+  'https://res.cloudinary.com/dqlvczepf/image/upload/repensa/products/tarsamrlj3u8r6db8knk',
+  'repensa/products/tarsamrlj3u8r6db8knk'
 ),
 (
   'clprodsensor001',
@@ -69,6 +77,6 @@ INSERT INTO products (
   'sensors',
   'good',
   'available',
-  'https://res.cloudinary.com/demo/image/upload/d_desert.jpg',
-  NULL
+  'https://res.cloudinary.com/dqlvczepf/image/upload/repensa/products/q729ruf8yahsnok5cbg2',
+  'repensa/products/q729ruf8yahsnok5cbg2'
 );

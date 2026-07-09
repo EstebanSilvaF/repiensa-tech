@@ -235,6 +235,14 @@
   transition: color 0.2s ease;
 }
 
+button.register-form__terms-link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
 .register-form__terms-link:hover {
   color: var(--color-primary-dark);
 }

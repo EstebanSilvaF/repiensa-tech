@@ -1,8 +1,8 @@
 interface CubeLogoIconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function CubeLogoIcon({ className }: CubeLogoIconProps) {
+export default function CubeLogoIcon({ className }: Readonly<CubeLogoIconProps>) {
   return (
     <svg
       className={className}

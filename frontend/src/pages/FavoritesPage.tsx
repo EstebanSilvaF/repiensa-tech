@@ -13,6 +13,63 @@ import { formatPrice } from '../utils/formatPrice'
 import HeartIcon from '../components/icons/HeartIcon'
 import './FavoritesPage.css'
 
+type FavoritesContentProps = Readonly<{
+  isLoading: boolean
+  products: Product[]
+}>
+
+function FavoritesContent({ isLoading, products }: FavoritesContentProps) {
+  if (isLoading) {
+    return <p className="favorites-page__status">Cargando favoritos...</p>
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="favorites-page__empty">
+        <HeartIcon className="favorites-page__empty-icon" />
+        <p>No tienes productos favoritos aún.</p>
+        <Link to={paths.gallery} className="favorites-page__action">
+          Ir al catálogo de productos
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="favorites-page__grid">
+      {products.map((product) => (
+        <Link
+          key={product.id}
+          to={paths.productDetail(product.id)}
+          className="favorites-page__card"
+        >
+          <div className="favorites-page__card-image">
+            {product.image_url ? (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="favorites-page__card-img"
+              />
+            ) : (
+              <ImagePlaceholderIcon />
+            )}
+          </div>
+          <div className="favorites-page__card-body">
+            <h2>{product.name}</h2>
+            {product.is_donation ? (
+              <span className="favorites-page__card-donation">Donación</span>
+            ) : (
+              <p className="favorites-page__card-price">
+                {formatPrice(product.price, false)}
+              </p>
+            )}
+          </div>
+        </Link>
+      ))}
+    </div>
+  )
+}
+
 export default function FavoritesPage() {
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const navigate = useNavigate()
@@ -93,49 +150,7 @@ export default function FavoritesPage() {
             <span className="favorites-page__badge">{favoriteCount} favoritos</span>
           </div>
 
-          {isLoading ? (
-            <p className="favorites-page__status">Cargando favoritos...</p>
-          ) : products.length === 0 ? (
-            <div className="favorites-page__empty">
-              <HeartIcon className="favorites-page__empty-icon" />
-              <p>No tienes productos favoritos aún.</p>
-              <Link to={paths.gallery} className="favorites-page__action">
-                Ir al catálogo de productos
-              </Link>
-            </div>
-          ) : (
-            <div className="favorites-page__grid">
-              {products.map((product) => (
-                <Link
-                  key={product.id}
-                  to={paths.productDetail(product.id)}
-                  className="favorites-page__card"
-                >
-                  <div className="favorites-page__card-image">
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="favorites-page__card-img"
-                      />
-                    ) : (
-                      <ImagePlaceholderIcon />
-                    )}
-                  </div>
-                  <div className="favorites-page__card-body">
-                    <h2>{product.name}</h2>
-                    {product.is_donation ? (
-                      <span className="favorites-page__card-donation">Donación</span>
-                    ) : (
-                      <p className="favorites-page__card-price">
-                        {formatPrice(product.price, false)}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          <FavoritesContent isLoading={isLoading} products={products} />
         </section>
       </main>
 

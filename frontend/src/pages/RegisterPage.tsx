@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type SubmitEvent, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { universityService } from '../api/universityService'
 import CheckCircleIcon from '../components/icons/CheckCircleIcon'
@@ -56,7 +56,7 @@ export default function RegisterPage() {
     }
   }, [])
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
 
@@ -255,13 +255,13 @@ export default function RegisterPage() {
               />
               <span>
                 Acepto los{' '}
-                <a href="#" className="register-form__terms-link">
+                <button type="button" className="register-form__terms-link">
                   Términos y Condiciones
-                </a>{' '}
+                </button>{' '}
                 y la{' '}
-                <a href="#" className="register-form__terms-link">
+                <button type="button" className="register-form__terms-link">
                   Política de Privacidad
-                </a>{' '}
+                </button>{' '}
                 de Re-Pensa Tech
               </span>
             </label>

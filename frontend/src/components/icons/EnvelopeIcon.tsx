@@ -1,8 +1,8 @@
 interface IconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function EnvelopeIcon({ className }: IconProps) {
+export default function EnvelopeIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}

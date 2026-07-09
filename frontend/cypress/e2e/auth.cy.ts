@@ -18,6 +18,18 @@ describe('Auth — autenticación', () => {
     });
   });
 
+  it('login exitoso de biblioteca redirige a /inicio', () => {
+    cy.fixture('users').then(({ library }) => {
+      cy.visit('/login');
+      cy.get('#email').type(library.email);
+      cy.get('#password').type(library.password);
+      cy.contains('button', 'Iniciar sesión').click();
+
+      cy.url().should('include', '/inicio');
+      cy.get('nav[aria-label="Navegación principal"]').contains('a', 'Biblioteca').should('be.visible');
+    });
+  });
+
   it('muestra error con credenciales inválidas', () => {
     cy.visit('/login');
     cy.get('#email').type('invalido@uniempresarial.edu.co');

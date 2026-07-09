@@ -1,8 +1,8 @@
 interface CheckCircleIconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function CheckCircleIcon({ className }: CheckCircleIconProps) {
+export default function CheckCircleIcon({ className }: Readonly<CheckCircleIconProps>) {
   return (
     <svg
       className={className}

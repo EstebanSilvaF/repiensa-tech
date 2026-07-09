@@ -96,7 +96,7 @@ export const chatService = {
     validateSendMessage(chat, userId);
 
     const existingMessage = await chatRepository.findMessageById(messageId);
-    if (!existingMessage || existingMessage.chat_id !== chatId) {
+    if (existingMessage?.chat_id !== chatId) {
       throw new Error('Mensaje no encontrado');
     }
     if (existingMessage.type !== 'appointment') {

@@ -89,7 +89,7 @@
   font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.45);
+  color: #595959;
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -142,7 +142,7 @@
 }
 
 .login-form__input::placeholder {
-  color: rgba(0, 0, 0, 0.42);
+  color: #595959;
 }
 
 .login-form__input:hover {
@@ -160,13 +160,20 @@
   font-family: var(--font-body);
   font-size: 0.78rem;
   font-weight: 500;
-  color: var(--color-primary);
+  color: #0f6b4d;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
+button.login-form__forgot {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 .login-form__forgot:hover {
-  color: var(--color-primary-dark);
+  color: #0a5239;
 }
 
 .login-form__success {
@@ -176,8 +183,8 @@
   font-family: var(--font-body);
   font-size: 0.8rem;
   line-height: 1.35;
-  color: #1a6b4a;
-  background: rgba(26, 156, 110, 0.1);
+  color: #083d2b;
+  background: #e2f3ec;
 }
 
 .login-form__error {
@@ -230,13 +237,13 @@
 
 .login-form__footer-link {
   font-weight: 600;
-  color: var(--color-primary);
+  color: #0f6b4d;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .login-form__footer-link:hover {
-  color: var(--color-primary-dark);
+  color: #0a5239;
 }
 
 @media (max-width: 900px) {

@@ -14,9 +14,7 @@ export const GROQ_MODEL =
 let client: Groq | null = null;
 
 function getGroqClient(): Groq {
-  if (!client) {
-    client = new Groq({ apiKey: readEnv('GROQ_API_KEY') });
-  }
+  client ??= new Groq({ apiKey: readEnv('GROQ_API_KEY') });
   return client;
 }
 

@@ -1,10 +1,10 @@
 import type { SVGProps } from 'react'
 
 interface HeartIconProps extends SVGProps<SVGSVGElement> {
-  filled?: boolean
+  readonly filled?: boolean
 }
 
-export default function HeartIcon({ filled = false, ...props }: HeartIconProps) {
+export default function HeartIcon({ filled = false, ...props }: Readonly<HeartIconProps>) {
   return (
     <svg
       viewBox="0 0 24 24"

@@ -1,4 +1,4 @@
-import type { ProductCategory, ProductCondition } from '../types/api'
+import type { ProductCategory, ProductCondition, ProductStatus } from '../types/api'
 
 export const conditionChips: { value: ProductCondition; label: string }[] = [
   { value: 'new', label: 'Casi nuevo' },
@@ -33,10 +33,20 @@ const categoryLabels: Record<ProductCategory, string> = {
   other: 'Otros',
 }
 
+const statusLabels: Record<ProductStatus, string> = {
+  available: 'Disponible',
+  reserved: 'Reservado',
+  sold: 'Vendido',
+}
+
 export function getConditionLabel(condition: ProductCondition): string {
   return conditionLabels[condition]
 }
 
 export function getCategoryLabel(category: ProductCategory): string {
   return categoryLabels[category]
+}
+
+export function getProductStatusLabel(status: ProductStatus): string {
+  return statusLabels[status]
 }

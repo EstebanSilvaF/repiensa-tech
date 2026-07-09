@@ -982,8 +982,9 @@ npm run db:reset   # migraciones + seed coordinado (Mongo + PostgreSQL)
 | Universidad | Universitaria Empresarial (`uniempresarial.edu.co`) |
 | Estudiante | `maria.rodriguez@uniempresarial.edu.co` / `Estudiante1!` |
 | Estudiante | `carlos.mendoza@uniempresarial.edu.co` / `Estudiante1!` |
+| Biblioteca | `biblioteca@uniempresarial.edu.co` / `biblioteca123` |
 | Admin | `admin@uniempresarial.edu.co` / `Admin1!` |
-| Productos demo | Arduino Uno R3, Sensor HC-SR04 (imágenes de cuenta demo Cloudinary) |
+| Productos demo | Arduino Uno R3, Sensor HC-SR04 (imágenes en `repensa/products` de tu cuenta Cloudinary; ver `npm run cloudinary:list`) |
 
 Para recargar el seed en desarrollo: `npm run db:reset` desde `backend/`.
 

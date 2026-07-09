@@ -1,8 +1,8 @@
-interface UserIconProps {
-  className?: string
+interface IconProps {
+  readonly className?: string
 }
 
-export default function UserIcon({ className }: UserIconProps) {
+export default function UserIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -12,9 +12,10 @@ export default function UserIcon({ className }: UserIconProps) {
       fill="none"
       aria-hidden="true"
     >
-      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.75" />
+      <circle cx="12" cy="12" r="9.25" stroke="currentColor" strokeWidth="1.75" />
+      <circle cx="12" cy="9.75" r="2.75" stroke="currentColor" strokeWidth="1.75" />
       <path
-        d="M5 20c0-3.314 3.134-6 7-6s7 2.686 7 6"
+        d="M6.5 19c1-2.75 3.25-4.25 5.5-4.25s4.5 1.5 5.5 4.25"
         stroke="currentColor"
         strokeWidth="1.75"
         strokeLinecap="round"

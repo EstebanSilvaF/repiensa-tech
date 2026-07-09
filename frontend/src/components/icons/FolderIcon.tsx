@@ -1,8 +1,8 @@
 interface IconProps {
-  className?: string
+  readonly className?: string
 }
 
-export default function FolderIcon({ className }: IconProps) {
+export default function FolderIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}

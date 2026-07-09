@@ -13,6 +13,7 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset --force",
     "cloudinary:check": "ts-node scripts/cloudinary-check.ts",
+    "cloudinary:list": "ts-node scripts/list-cloudinary-images.ts",
     "build": "prisma generate && tsc -p tsconfig.build.json",
     "start": "node dist/index.js"
   },

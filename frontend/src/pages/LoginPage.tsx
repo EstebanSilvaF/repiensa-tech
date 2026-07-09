@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type SubmitEvent, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import CheckCircleIcon from '../components/icons/CheckCircleIcon'
 import { useAuth } from '../hooks/useAuth'
@@ -17,7 +17,7 @@ export default function LoginPage() {
     navigate(paths.login, { replace: true })
   }, [navigate])
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
     setIsSubmitting(true)
@@ -86,9 +86,9 @@ export default function LoginPage() {
               />
             </div>
 
-            <a href="#" className="login-form__forgot">
+            <button type="button" className="login-form__forgot">
               ¿Olvidaste tu contraseña?
-            </a>
+            </button>
 
             {error && (
               <p className="login-form__error" role="alert">

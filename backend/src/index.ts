@@ -1,8 +1,8 @@
-import { createServer } from 'http';
+import { createServer } from 'node:http';
 import 'dotenv/config';
 import app from './app';
 import { prisma } from './infrastructure/persistence/prisma';
-import { connectMongo, disconnectMongo } from './infrastructure/persistence/mongo/connection';
+import { connectMongo } from './infrastructure/persistence/mongo/connection';
 import { env } from './infrastructure/config/env';
 import { isSwaggerEnabled } from './infrastructure/config/swagger';
 import { scheduleJobs } from './application/jobs/scheduleJobs';

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { reservationService } from '../api/reservationService'
 import { useAuth } from '../hooks/useAuth'
 import { transactionService } from '../api/transactionService'
@@ -58,8 +58,73 @@ function transactionMeta(tx: Transaction): string {
   return `Donación · ${date} · Donado a: ${tx.counterparty_name}`
 }
 
+type HistoryListProps = Readonly<{
+  isLoading: boolean
+  error: string | null
+  grouped: [string, Transaction[]][]
+}>
+
+function HistoryList({ isLoading, error, grouped }: HistoryListProps) {
+  if (isLoading) {
+    return <p className="history-page__status">Cargando historial...</p>
+  }
+
+  if (error) {
+    return (
+      <p className="history-page__status" role="alert">
+        {error}
+      </p>
+    )
+  }
+
+  if (grouped.length === 0) {
+    return (
+      <p className="history-page__status">No hay transacciones con este filtro.</p>
+    )
+  }
+
+  return (
+    <>
+      {grouped.map(([month, items]) => (
+        <div key={month} className="history-month">
+          <h2 className="history-month__title">{month}</h2>
+          <ul className="history-month__items">
+            {items.map((tx) => (
+              <li key={tx.id} className="history-item">
+                <div className="history-item__thumb">
+                  {tx.image_url ? (
+                    <img src={tx.image_url} alt="" />
+                  ) : (
+                    <ImagePlaceholderIcon />
+                  )}
+                </div>
+                <div className="history-item__body">
+                  <p className="history-item__name">{tx.product_name}</p>
+                  <p className="history-item__meta">{transactionMeta(tx)}</p>
+                </div>
+                <div className="history-item__aside">
+                  <span
+                    className={`history-item__amount history-item__amount--${tx.type}`}
+                  >
+                    {formatAmount(tx.amount)}
+                  </span>
+                  <span
+                    className={`history-item__badge history-item__badge--${tx.status}`}
+                  >
+                    {STATUS_LABELS[tx.status]}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </>
+  )
+}
+
 export default function HistoryPage() {
-  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth()
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const navigate = useNavigate()
   const [filter, setFilter] = useState<TransactionFilter>('all')
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -73,7 +138,7 @@ export default function HistoryPage() {
   }, [isAuthenticated, isAuthLoading, navigate])
 
   useEffect(() => {
-    if (!isAuthenticated || user?.role !== 'library') return
+    if (!isAuthenticated) return
 
     let cancelled = false
 
@@ -111,7 +176,7 @@ export default function HistoryPage() {
     return () => {
       cancelled = true
     }
-  }, [isAuthenticated, user?.role])
+  }, [isAuthenticated])
 
   const filtered = useMemo(() => {
     if (filter === 'all') return transactions
@@ -122,15 +187,6 @@ export default function HistoryPage() {
     () => buildHistorySummary(transactions),
     [transactions],
   )
-
-  function handleBack() {
-    if (window.history.length > 1) {
-      navigate(-1)
-      return
-    }
-
-    navigate(paths.profile, { replace: true })
-  }
 
   const grouped = useMemo(() => {
     const map = new Map<string, Transaction[]>()
@@ -155,25 +211,14 @@ export default function HistoryPage() {
     )
   }
 
-  if (user?.role !== 'library') {
-    return (
-      <div className="history-page">
-        <AppNavbar />
-        <main className="history-page__main">
-          <p className="history-page__status">Esta vista es exclusiva para la biblioteca.</p>
-        </main>
-      </div>
-    )
-  }
-
   return (
     <div className="history-page">
       <AppNavbar />
 
       <main className="history-page__main">
-        <button type="button" className="history-page__back" onClick={handleBack}>
+        <Link to={paths.gallery} className="history-page__back">
           ← Volver
-        </button>
+        </Link>
 
         <header className="history-page__header">
           <h1 className="history-page__title">Historial</h1>
@@ -203,11 +248,8 @@ export default function HistoryPage() {
           </article>
         </section>
 
-        <div
-          className="history-page__filters"
-          role="group"
-          aria-label="Filtrar transacciones"
-        >
+        <fieldset className="history-page__filters">
+          <legend className="history-page__filters-legend">Filtrar transacciones</legend>
           {FILTERS.map(({ key, label }) => (
             <button
               key={key}
@@ -220,55 +262,10 @@ export default function HistoryPage() {
               {label}
             </button>
           ))}
-        </div>
+        </fieldset>
 
         <section className="history-page__list">
-          {isLoading ? (
-            <p className="history-page__status">Cargando historial...</p>
-          ) : error ? (
-            <p className="history-page__status" role="alert">
-              {error}
-            </p>
-          ) : grouped.length === 0 ? (
-            <p className="history-page__status">
-              No hay transacciones con este filtro.
-            </p>
-          ) : (
-            grouped.map(([month, items]) => (
-              <div key={month} className="history-month">
-                <h2 className="history-month__title">{month}</h2>
-                <ul className="history-month__items">
-                  {items.map((tx) => (
-                    <li key={tx.id} className="history-item">
-                      <div className="history-item__thumb">
-                        {tx.image_url ? (
-                          <img src={tx.image_url} alt="" />
-                        ) : (
-                          <ImagePlaceholderIcon />
-                        )}
-                      </div>
-                      <div className="history-item__body">
-                        <p className="history-item__name">{tx.product_name}</p>
-                        <p className="history-item__meta">{transactionMeta(tx)}</p>
-                      </div>
-                      <div className="history-item__aside">
-                        <span
-                          className={`history-item__amount history-item__amount--${tx.type}`}
-                        >
-                          {formatAmount(tx.amount)}
-                        </span>
-                        <span
-                          className={`history-item__badge history-item__badge--${tx.status}`}
-                        >
-                          {STATUS_LABELS[tx.status]}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          )}
+          <HistoryList isLoading={isLoading} error={error} grouped={grouped} />
         </section>
       </main>
 

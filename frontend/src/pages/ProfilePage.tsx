@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react'
+import { type SubmitEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AppNavbar from '../components/layout/AppNavbar'
 import { useAuth } from '../hooks/useAuth'
@@ -34,7 +34,7 @@ export default function ProfilePage() {
     navigate(paths.login, { replace: true })
   }
 
-  async function handlePasswordSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handlePasswordSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
     setStatus(null)
