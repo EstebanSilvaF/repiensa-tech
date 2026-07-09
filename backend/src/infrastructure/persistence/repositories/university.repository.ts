@@ -9,7 +9,7 @@ function mapUniversity(row: {
   id: string;
   name: string;
   emailDomain: string;
-  subscriptionStatus: string;
+  subscriptionStatus: SubscriptionStatus;
   subscriptionStart: Date | null;
   subscriptionEnd: Date | null;
   createdAt: Date;
